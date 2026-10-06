@@ -2,9 +2,15 @@ import { useState, useEffect } from "react";
 import BottomNav from "../components/shared/BottomNav";
 import OrderCard from "../components/orders/OrderCard";
 import BackButton from "../components/shared/BackButton";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getOrders } from "../https/index";
 import { enqueueSnackbar } from "notistack"
+import { useOrders } from "../hooks/queries";
+
+const filters = [
+  { key: "all", label: "All" },
+  { key: "In Progress", label: "In Progress" },
+  { key: "Ready", label: "Ready" },
+  { key: "Completed", label: "Completed" },
+];
 
 const Orders = () => {
 
@@ -14,19 +20,15 @@ const Orders = () => {
       document.title = "POS | Orders"
     }, [])
 
-  const { data: resData, isError } = useQuery({
-    queryKey: ["orders"],
-    queryFn: async () => {
-      return await getOrders();
-    },
-    placeholderData: keepPreviousData
-  })
+  const { data: orders = [], isError } = useOrders();
 
   useEffect(() => {
     if (isError) {
       enqueueSnackbar("Something went wrong!", { variant: "error" });
     }
   }, [isError]);
+
+  const visibleOrders = status === "all" ? orders : orders.filter((order) => order.orderStatus === status);
 
   return (
     <section className="bg-[#1f1f1f]  h-[calc(100vh-5rem)] overflow-hidden">
@@ -38,25 +40,22 @@ const Orders = () => {
           </h1>
         </div>
         <div className="flex items-center justify-around gap-4">
-          <button onClick={() => setStatus("all")} className={`text-[#ababab] text-lg ${status === "all" && "bg-[#383838] rounded-lg px-5 py-2"}  rounded-lg px-5 py-2 font-semibold`}>
-            All
-          </button>
-          <button onClick={() => setStatus("progress")} className={`text-[#ababab] text-lg ${status === "progress" && "bg-[#383838] rounded-lg px-5 py-2"}  rounded-lg px-5 py-2 font-semibold`}>
-            In Progress
-          </button>
-          <button onClick={() => setStatus("ready")} className={`text-[#ababab] text-lg ${status === "ready" && "bg-[#383838] rounded-lg px-5 py-2"}  rounded-lg px-5 py-2 font-semibold`}>
-            Ready
-          </button>
-          <button onClick={() => setStatus("completed")} className={`text-[#ababab] text-lg ${status === "completed" && "bg-[#383838] rounded-lg px-5 py-2"}  rounded-lg px-5 py-2 font-semibold`}>
-            Completed
-          </button>
+          {filters.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setStatus(key)}
+              className={`text-[#ababab] text-lg ${status === key ? "bg-[#383838]" : ""} rounded-lg px-5 py-2 font-semibold`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 px-16 py-4 overflow-y-scroll scrollbar-hide">
+      <div className="grid grid-cols-3 gap-3 px-16 py-4 h-[calc(100vh-14rem)] overflow-y-scroll scrollbar-hide content-start">
         {
-          resData?.data.data.length > 0 ? (
-            resData.data.data.map((order) => {
+          visibleOrders.length > 0 ? (
+            visibleOrders.map((order) => {
               return <OrderCard key={order._id} order={order} />
             })
           ) : <p className="col-span-3 text-gray-500">No orders available</p>

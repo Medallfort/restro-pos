@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { motion } from "framer-motion";
 import { FaCheck } from "react-icons/fa6";
+import { formatPrice } from "../../utils";
 
 const Invoice = ({ orderInfo, setShowInvoice }) => {
   const invoiceRef = useRef(null);
@@ -91,7 +92,7 @@ const Invoice = ({ orderInfo, setShowInvoice }) => {
                   <span>
                     {item.name} x{item.quantity}
                   </span>
-                  <span>₹{item.price.toFixed(2)}</span>
+                  <span>{formatPrice(item.price)}</span>
                 </li>
               ))}
             </ul>
@@ -101,14 +102,14 @@ const Invoice = ({ orderInfo, setShowInvoice }) => {
 
           <div className="mt-4 border-t pt-4 text-sm">
             <p>
-              <strong>Subtotal:</strong> ₹{orderInfo.bills.total.toFixed(2)}
+              <strong>Subtotal:</strong> {formatPrice(orderInfo.bills.total)}
             </p>
             <p>
-              <strong>Tax:</strong> ₹{orderInfo.bills.tax.toFixed(2)}
+              <strong>Tax:</strong> {formatPrice(orderInfo.bills.tax)}
             </p>
             <p className="text-md font-semibold">
-              <strong>Grand Total:</strong> ₹
-              {orderInfo.bills.totalWithTax.toFixed(2)}
+              <strong>Grand Total:</strong>{" "}
+              {formatPrice(orderInfo.bills.totalWithTax)}
             </p>
           </div>
 

@@ -1,17 +1,23 @@
 import { useState, useEffect } from "react";
-import { MdTableBar, MdCategory } from "react-icons/md";
+import { MdTableBar } from "react-icons/md";
 import { BiSolidDish } from "react-icons/bi";
 import Metrics from "../components/dashboard/Metrics";
 import RecentOrders from "../components/dashboard/RecentOrders";
+import MenuManager from "../components/dashboard/MenuManager";
+import StaffManager from "../components/dashboard/StaffManager";
 import Modal from "../components/dashboard/Modal";
 
 const buttons = [
   { label: "Add Table", icon: <MdTableBar />, action: "table" },
-  { label: "Add Category", icon: <MdCategory />, action: "category" },
-  { label: "Add Dishes", icon: <BiSolidDish />, action: "dishes" },
+  { label: "Add Dish", icon: <BiSolidDish />, action: "dish" },
 ];
 
-const tabs = ["Metrics", "Orders", "Payments"];
+const tabs = {
+  Metrics: <Metrics />,
+  Orders: <RecentOrders />,
+  Menu: <MenuManager />,
+  Staff: <StaffManager />,
+};
 
 const Dashboard = () => {
 
@@ -19,22 +25,18 @@ const Dashboard = () => {
     document.title = "POS | Admin Dashboard"
   }, [])
 
-  const [isTableModalOpen, setIsTableModalOpen] = useState(false);
+  const [openModal, setOpenModal] = useState(null);
   const [activeTab, setActiveTab] = useState("Metrics");
 
-  const handleOpenModal = (action) => {
-    if (action === "table") setIsTableModalOpen(true);
-  };
-
   return (
-    <div className="bg-[#1f1f1f] h-[calc(100vh-5rem)]">
+    <div className="bg-[#1f1f1f] h-[calc(100vh-5rem)] overflow-y-auto">
       <div className="container mx-auto flex items-center justify-between py-14 px-6 md:px-4">
         <div className="flex items-center gap-3">
           {buttons.map(({ label, icon, action }) => {
             return (
               <button
                 key={action}
-                onClick={() => handleOpenModal(action)}
+                onClick={() => setOpenModal(action)}
                 className="bg-[#1a1a1a] hover:bg-[#262626] px-8 py-3 rounded-lg text-[#f5f5f5] font-semibold text-md flex items-center gap-2"
               >
                 {label} {icon}
@@ -44,7 +46,7 @@ const Dashboard = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          {tabs.map((tab) => {
+          {Object.keys(tabs).map((tab) => {
             return (
               <button
                 key={tab}
@@ -63,15 +65,9 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {activeTab === "Metrics" && <Metrics />}
-      {activeTab === "Orders" && <RecentOrders />}
-      {activeTab === "Payments" && 
-        <div className="text-white p-6 container mx-auto">
-          Payment Component Coming Soon
-        </div>
-      }
+      {tabs[activeTab]}
 
-      {isTableModalOpen && <Modal setIsTableModalOpen={setIsTableModalOpen} />}
+      {openModal && <Modal type={openModal} onClose={() => setOpenModal(null)} />}
     </div>
   );
 };

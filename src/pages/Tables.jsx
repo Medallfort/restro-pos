@@ -2,9 +2,14 @@ import { useState, useEffect } from "react";
 import BottomNav from "../components/shared/BottomNav";
 import BackButton from "../components/shared/BackButton";
 import TableCard from "../components/tables/TableCard";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { enqueueSnackbar } from "notistack";
-import { getTables } from "../https";
+import { useTables } from "../hooks/queries";
+
+const filters = [
+  { key: "all", label: "All" },
+  { key: "Available", label: "Available" },
+  { key: "Booked", label: "Booked" },
+];
 
 const Tables = () => {
   const [status, setStatus] = useState("all");
@@ -13,19 +18,15 @@ const Tables = () => {
       document.title = "POS | Tables"
     }, [])
 
-  const { data: resData, isError } = useQuery({
-    queryKey: ["tables"],
-    queryFn: async () => {
-      return await getTables();
-    },
-    placeholderData: keepPreviousData,
-  });
+  const { data: tables = [], isError } = useTables();
 
   useEffect(() => {
     if (isError) {
       enqueueSnackbar("Something went wrong!", { variant: "error" });
     }
   }, [isError]);
+
+  const visibleTables = status === "all" ? tables : tables.filter((table) => table.status === status);
 
   return (
     <section className="bg-[#1f1f1f]  h-[calc(100vh-5rem)] overflow-hidden">
@@ -37,27 +38,23 @@ const Tables = () => {
           </h1>
         </div>
         <div className="flex items-center justify-around gap-4">
-          <button
-            onClick={() => setStatus("all")}
-            className={`text-[#ababab] text-lg ${
-              status === "all" && "bg-[#383838] rounded-lg px-5 py-2"
-            }  rounded-lg px-5 py-2 font-semibold`}
-          >
-            All
-          </button>
-          <button
-            onClick={() => setStatus("booked")}
-            className={`text-[#ababab] text-lg ${
-              status === "booked" && "bg-[#383838] rounded-lg px-5 py-2"
-            }  rounded-lg px-5 py-2 font-semibold`}
-          >
-            Booked
-          </button>
+          {filters.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setStatus(key)}
+              className={`text-[#ababab] text-lg ${status === key ? "bg-[#383838]" : ""} rounded-lg px-5 py-2 font-semibold`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-5 gap-3 px-16 py-4 h-[650px] overflow-y-scroll scrollbar-hide">
-        {resData?.data.data.map((table) => {
+      <div className="grid grid-cols-5 gap-3 px-16 py-4 h-[650px] overflow-y-scroll scrollbar-hide content-start">
+        {visibleTables.length === 0 && (
+          <p className="col-span-5 text-gray-500">No tables. An admin can add them from the dashboard.</p>
+        )}
+        {visibleTables.map((table) => {
           return (
             <TableCard
               key={table._id}

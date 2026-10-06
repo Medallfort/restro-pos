@@ -3,6 +3,7 @@ import { RiDeleteBin2Fill } from "react-icons/ri";
 import { FaNotesMedical } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import { removeItem } from "../../redux/slices/cartSlice";
+import { formatPrice } from "../../utils";
 
 const CartInfo = () => {
   const cartData = useSelector((state) => state.cart);
@@ -51,7 +52,7 @@ const CartInfo = () => {
                     size={20}
                   />
                 </div>
-                <p className="text-[#f5f5f5] text-md font-bold">₹{item.price}</p>
+                <p className="text-[#f5f5f5] text-md font-bold">{formatPrice(item.price)}</p>
               </div>
             </div>
           );

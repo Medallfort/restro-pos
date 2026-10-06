@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react'
+import { useSelector } from "react-redux";
+
+const greeting = (hour) => (hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening");
 
 const Greetings = () => {
   const [dateTime, setDateTime] = useState(new Date());
+  const userName = useSelector((state) => state.user.name);
 
   useEffect(() => {
     const interval = setInterval(() => setDateTime(new Date()), 1000);
@@ -23,7 +27,7 @@ const Greetings = () => {
   return (
     <div className="flex justify-between items-center px-8 mt-5">
       <div>
-        <h1 className="text-2xl font-semibold text-[#f5f5f5] tracking-wide">Good Morning, Amine</h1>
+        <h1 className="text-2xl font-semibold text-[#f5f5f5] tracking-wide">{greeting(dateTime.getHours())}, {userName}</h1>
         <p className="text-[#ababab] text-sm">Give your best services for your customers!</p>
       </div>
       <div>

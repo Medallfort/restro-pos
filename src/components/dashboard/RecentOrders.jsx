@@ -1,34 +1,33 @@
 import { useEffect } from "react";
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { enqueueSnackbar } from "notistack";
-import { getOrders, updateOrderStatus } from "../../https/index";
-import { formatDateAndTime } from "../../utils";
+import { getErrorMessage, updateOrderStatus } from "../../https/index";
+import { formatDateAndTime, formatPrice } from "../../utils";
+import { ORDER_RELATED_KEYS, useOrders } from "../../hooks/queries";
+import { ORDER_STATUSES } from "../../constants";
+
+const statusColor = {
+  "In Progress": "text-yellow-500",
+  Ready: "text-green-500",
+  Completed: "text-[#9aa9ff]",
+};
 
 const RecentOrders = () => {
   const queryClient = useQueryClient();
-  const handleStatusChange = ({orderId, orderStatus}) => {
-    orderStatusUpdateMutation.mutate({orderId, orderStatus});
-  };
 
   const orderStatusUpdateMutation = useMutation({
-    mutationFn: ({orderId, orderStatus}) => updateOrderStatus({orderId, orderStatus}),
+    mutationFn: updateOrderStatus,
     onSuccess: () => {
       enqueueSnackbar("Order status updated successfully!", { variant: "success" });
-      // React Query v5: invalidateQueries kayakhod objet { queryKey }
-      queryClient.invalidateQueries({ queryKey: ["orders"] }); // Refresh order list
+      // Completed kat7err table, donc tables w stats tahouma tbeddlo
+      ORDER_RELATED_KEYS.forEach((queryKey) => queryClient.invalidateQueries({ queryKey }));
     },
-    onError: () => {
-      enqueueSnackbar("Failed to update order status!", { variant: "error" });
+    onError: (error) => {
+      enqueueSnackbar(getErrorMessage(error), { variant: "error" });
     }
   })
 
-  const { data: resData, isError } = useQuery({
-    queryKey: ["orders"],
-    queryFn: async () => {
-      return await getOrders();
-    },
-    placeholderData: keepPreviousData,
-  });
+  const { data: orders = [], isError } = useOrders();
 
   useEffect(() => {
     if (isError) {
@@ -56,36 +55,32 @@ const RecentOrders = () => {
             </tr>
           </thead>
           <tbody>
-            {resData?.data.data.map((order, index) => (
+            {orders.map((order) => (
               <tr
-                key={index}
+                key={order._id}
                 className="border-b border-gray-600 hover:bg-[#333]"
               >
                 <td className="p-4">#{Math.floor(new Date(order.orderDate).getTime())}</td>
                 <td className="p-4">{order.customerDetails.name}</td>
                 <td className="p-4">
                   <select
-                    className={`bg-[#1a1a1a] text-[#f5f5f5] border border-gray-500 p-2 rounded-lg focus:outline-none ${
-                      order.orderStatus === "Ready"
-                        ? "text-green-500"
-                        : "text-yellow-500"
-                    }`}
+                    className={`bg-[#1a1a1a] border border-gray-500 p-2 rounded-lg focus:outline-none ${statusColor[order.orderStatus]}`}
                     value={order.orderStatus}
-                    onChange={(e) => handleStatusChange({orderId: order._id, orderStatus: e.target.value})}
+                    disabled={order.orderStatus === "Completed" || orderStatusUpdateMutation.isPending}
+                    onChange={(e) => orderStatusUpdateMutation.mutate({ orderId: order._id, orderStatus: e.target.value })}
                   >
-                    <option className="text-yellow-500" value="In Progress">
-                      In Progress
-                    </option>
-                    <option className="text-green-500" value="Ready">
-                      Ready
-                    </option>
+                    {ORDER_STATUSES.map((status) => (
+                      <option key={status} className={statusColor[status]} value={status}>
+                        {status}
+                      </option>
+                    ))}
                   </select>
                 </td>
                 <td className="p-4">{formatDateAndTime(order.orderDate)}</td>
                 <td className="p-4">{order.items.length} Items</td>
-                <td className="p-4">Table - {order.table.tableNo}</td>
-                <td className="p-4">₹{order.bills.totalWithTax}</td>
-                <td className="p-4">
+                <td className="p-4">Table - {order.table?.tableNo ?? "-"}</td>
+                <td className="p-4">{formatPrice(order.bills.totalWithTax)}</td>
+                <td className="p-4 text-center">
                   {order.paymentMethod}
                 </td>
               </tr>

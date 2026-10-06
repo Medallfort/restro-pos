@@ -47,4 +47,5 @@ export const formatDateAndTime = (date) => {
 }
 
 // Kayst3melha MiniCard
-export const formatPrice = (amount) => `${Number(amount).toLocaleString("fr-MA")} DH`;
+export const formatPrice = (amount) =>
+  `${Number(amount).toLocaleString("fr-MA", { maximumFractionDigits: 2 })} DH`;

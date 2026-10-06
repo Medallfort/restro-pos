@@ -1,104 +1,53 @@
-import { itemsData, metricsData } from "../../constants";
+import { useStats } from "../../hooks/queries";
+import { formatPrice } from "../../utils";
+
+const StatCard = ({ title, value, color }) => (
+  <div className="shadow-sm rounded-lg p-4" style={{ backgroundColor: color }}>
+    <p className="font-medium text-xs text-[#f5f5f5]">{title}</p>
+    <p className="mt-1 font-semibold text-2xl text-[#f5f5f5]">{value}</p>
+  </div>
+);
 
 const Metrics = () => {
+  const { data: stats, isLoading } = useStats();
+
+  if (isLoading || !stats) {
+    return <p className="container mx-auto px-6 text-[#ababab]">Loading metrics...</p>;
+  }
+
+  const performance = [
+    { title: "Revenue (today)", value: formatPrice(stats.todayRevenue), color: "#025cca" },
+    { title: "Orders (today)", value: stats.todayOrders, color: "#02ca3a" },
+    { title: "Customers (today)", value: stats.todayGuests, color: "#f6b100" },
+    { title: "Ready to serve", value: stats.ready, color: "#be3e3f" },
+  ];
+
+  const items = [
+    { title: "Total Categories", value: stats.categories, color: "#5b45b0" },
+    { title: "Total Dishes", value: stats.dishes, color: "#285430" },
+    { title: "Active Orders", value: stats.inProgress + stats.ready, color: "#735f32" },
+    { title: "Tables Booked", value: `${stats.bookedTables} / ${stats.totalTables}`, color: "#7f167f" },
+  ];
+
   return (
     <div className="container mx-auto py-2 px-6 md:px-4">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="font-semibold text-[#f5f5f5] text-xl">
-            Overall Performance
-          </h2>
-          <p className="text-sm text-[#ababab]">
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-            Distinctio, obcaecati?
-          </p>
-        </div>
-        <button className="flex items-center gap-1 px-4 py-2 rounded-md text-[#f5f5f5] bg-[#1a1a1a]">
-          Last 1 Month
-          <svg
-            className="w-3 h-3"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="4"
-          >
-            <path d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
+      <div>
+        <h2 className="font-semibold text-[#f5f5f5] text-xl">Overall Performance</h2>
+        <p className="text-sm text-[#ababab]">Today's sales and service activity, updated every minute.</p>
       </div>
 
       <div className="mt-6 grid grid-cols-4 gap-4">
-        {metricsData.map((metric, index) => {
-          return (
-            <div
-              key={index}
-              className="shadow-sm rounded-lg p-4"
-              style={{ backgroundColor: metric.color }}
-            >
-              <div className="flex justify-between items-center">
-                <p className="font-medium text-xs text-[#f5f5f5]">
-                  {metric.title}
-                </p>
-                <div className="flex items-center gap-1">
-                  <svg
-                    className="w-3 h-3"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    fill="none"
-                    style={{ color: metric.isIncrease ? "#f5f5f5" : "red" }}
-                  >
-                    <path
-                      d={metric.isIncrease ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"}
-                    />
-                  </svg>
-                  <p
-                    className="font-medium text-xs"
-                    style={{ color: metric.isIncrease ? "#f5f5f5" : "red" }}
-                  >
-                    {metric.percentage}
-                  </p>
-                </div>
-              </div>
-              <p className="mt-1 font-semibold text-2xl text-[#f5f5f5]">
-                {metric.value}
-              </p>
-            </div>
-          );
-        })}
+        {performance.map((metric) => <StatCard key={metric.title} {...metric} />)}
       </div>
 
       <div className="flex flex-col justify-between mt-12">
         <div>
-          <h2 className="font-semibold text-[#f5f5f5] text-xl">
-            Item Details
-          </h2>
-          <p className="text-sm text-[#ababab]">
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-            Distinctio, obcaecati?
-          </p>
+          <h2 className="font-semibold text-[#f5f5f5] text-xl">Item Details</h2>
+          <p className="text-sm text-[#ababab]">Menu, orders and table occupancy right now.</p>
         </div>
 
         <div className="mt-6 grid grid-cols-4 gap-4">
-
-            {
-                itemsData.map((item, index) => {
-                    return (
-                        <div key={index} className="shadow-sm rounded-lg p-4" style={{ backgroundColor: item.color }}>
-                        <div className="flex justify-between items-center">
-                          <p className="font-medium text-xs text-[#f5f5f5]">{item.title}</p>
-                          <div className="flex items-center gap-1">
-                            <svg className="w-3 h-3 text-white" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4" fill="none">
-                              <path d="M5 15l7-7 7 7" />
-                            </svg>
-                            <p className="font-medium text-xs text-[#f5f5f5]">{item.percentage}</p>
-                          </div>
-                        </div>
-                        <p className="mt-1 font-semibold text-2xl text-[#f5f5f5]">{item.value}</p>
-                      </div>
-                    )
-                })
-            }
-
+          {items.map((item) => <StatCard key={item.title} {...item} />)}
         </div>
       </div>
     </div>
