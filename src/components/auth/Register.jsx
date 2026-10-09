@@ -6,9 +6,9 @@ import { enqueueSnackbar } from "notistack";
 const emptyForm = { name: "", email: "", phone: "", password: "" };
 
 const fields = [
-  { name: "name", label: "Employee Name", type: "text", placeholder: "Enter employee name" },
-  { name: "email", label: "Employee Email", type: "email", placeholder: "Enter employee email" },
-  { name: "phone", label: "Employee Phone", type: "tel", placeholder: "+212 6XX XX XX XX" },
+  { name: "name", label: "Name", type: "text", placeholder: "Enter your name" },
+  { name: "email", label: "Email", type: "email", placeholder: "Enter your email" },
+  { name: "phone", label: "Phone", type: "tel", placeholder: "+212 6XX XX XX XX" },
   { name: "password", label: "Password", type: "password", placeholder: "At least 8 characters", minLength: 8 },
 ];
 
@@ -62,7 +62,7 @@ const Register = ({setIsRegister}) => {
 
         {/* Role kay3tih Admin men Dashboard, machi l-utilisateur */}
         <p className="text-xs text-[#ababab] mt-4">
-          The first account becomes Admin. Other accounts start as Waiter until an admin assigns a role.
+          New accounts are customer accounts. Staff: sign up, then ask the admin to give you the Waiter or Cashier role.
         </p>
 
         <button

@@ -7,6 +7,7 @@ import { useOrders } from "../hooks/queries";
 
 const filters = [
   { key: "all", label: "All" },
+  { key: "Pending", label: "To confirm" },
   { key: "In Progress", label: "In Progress" },
   { key: "Ready", label: "Ready" },
   { key: "Completed", label: "Completed" },

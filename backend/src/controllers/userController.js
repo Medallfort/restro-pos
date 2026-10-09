@@ -4,7 +4,7 @@ import User from "../models/User.js";
 import AppError from "../utils/AppError.js";
 import { COOKIE_NAME, cookieOptions, signToken } from "../middleware/auth.js";
 
-const BCRYPT_ROUNDS = 12;
+export const BCRYPT_ROUNDS = 12;
 
 // Hash dyal password wahmi: ila email ma kaynch, kandirou nefs l-khedma dyal bcrypt
 // bach wa9t l-jawab ykoun nefsou (sinon attaquant y3ref chmen emails kaynin b l-wa9t)
@@ -13,8 +13,8 @@ const DUMMY_HASH = bcrypt.hashSync("timing-attack-protection", BCRYPT_ROUNDS);
 export async function register(req, res) {
   const { name, email, phone, password } = req.body;
 
-  // Awel compte f système kaywelli Admin (bootstrap). Ay compte mn ba3d kaybda Waiter,
-  // w Admin bo7do li y9der ybeddel role (machi l-utilisateur li kaykhtar role dyalo).
+  // Awel compte f système kaywelli Admin (bootstrap). Ay compte mn ba3d kaybda Client,
+  // w Admin bo7do li y9der y-promoter chi wa7d l Waiter/Cashier (machi l-utilisateur li kaykhtar role dyalo).
   const isFirstUser = (await User.countDocuments()) === 0;
   const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
@@ -23,14 +23,14 @@ export async function register(req, res) {
     email,
     phone,
     password: hashedPassword,
-    role: isFirstUser ? "Admin" : "Waiter",
+    role: isFirstUser ? "Admin" : "Client",
   });
 
   res.status(201).json({
     success: true,
     message: isFirstUser
       ? "Admin account created! You can now log in."
-      : "Account created! An admin will assign your role.",
+      : "Account created! You can now log in.",
   });
 }
 

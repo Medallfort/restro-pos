@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 
-export const ROLES = ["Admin", "Cashier", "Waiter"];
+export const ROLES = ["Admin", "Cashier", "Waiter", "Client"];
+// Les employés (kolchi men ghir Client)
+export const STAFF_ROLES = ["Admin", "Cashier", "Waiter"];
 
 const userSchema = new mongoose.Schema(
   {
@@ -9,7 +11,7 @@ const userSchema = new mongoose.Schema(
     phone: { type: String, required: true, trim: true },
     // select: false -> l-hash ma kayrje3ch f les requetes ila ma tlebtihch b .select("+password")
     password: { type: String, required: true, select: false },
-    role: { type: String, enum: ROLES, default: "Waiter" },
+    role: { type: String, enum: ROLES, default: "Client" },
   },
   { timestamps: true }
 );

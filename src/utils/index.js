@@ -49,3 +49,6 @@ export const formatDateAndTime = (date) => {
 // Kayst3melha MiniCard
 export const formatPrice = (amount) =>
   `${Number(amount).toLocaleString("fr-MA", { maximumFractionDigits: 2 })} DH`;
+// "Table 4" wla "Takeaway" (les commandes 9dam ma 3ndhomch orderType: Dine In)
+export const orderLabel = (order) =>
+  order.orderType === "Takeaway" ? "Takeaway" : `Table ${order.table?.tableNo ?? "-"}`;

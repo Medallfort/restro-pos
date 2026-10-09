@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import BottomNav from "../components/shared/BottomNav";
 import BackButton from "../components/shared/BackButton";
 import TableCard from "../components/tables/TableCard";
+import TableHistory from "../components/tables/TableHistory";
 import { enqueueSnackbar } from "notistack";
 import { useTables } from "../hooks/queries";
 
@@ -13,6 +14,7 @@ const filters = [
 
 const Tables = () => {
   const [status, setStatus] = useState("all");
+  const [historyTable, setHistoryTable] = useState(null);
 
     useEffect(() => {
       document.title = "POS | Tables"
@@ -63,10 +65,13 @@ const Tables = () => {
               status={table.status}
               initials={table?.currentOrder?.customerDetails.name}
               seats={table.seats}
+              onShowHistory={setHistoryTable}
             />
           );
         })}
       </div>
+
+      <TableHistory table={historyTable} onClose={() => setHistoryTable(null)} />
 
       <BottomNav />
     </section>

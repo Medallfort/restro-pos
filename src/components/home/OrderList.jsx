@@ -1,5 +1,5 @@
 import { FaLongArrowAltRight } from "react-icons/fa";
-import { getAvatarName } from "../../utils/index";
+import { getAvatarName, orderLabel } from "../../utils/index";
 import StatusBadge from "../shared/StatusBadge";
 
 const OrderList = ({ order }) => {
@@ -17,8 +17,14 @@ const OrderList = ({ order }) => {
         </div>
 
         <h1 className="text-[#f6b100] font-semibold border border-[#f6b100] rounded-lg p-1">
-          Table <FaLongArrowAltRight className="text-[#ababab] ml-2 inline" />{" "}
-          {order.table?.tableNo ?? "-"}
+          {order.orderType === "Takeaway" ? (
+            orderLabel(order)
+          ) : (
+            <>
+              Table <FaLongArrowAltRight className="text-[#ababab] ml-2 inline" />{" "}
+              {order.table?.tableNo ?? "-"}
+            </>
+          )}
         </h1>
 
         <StatusBadge status={order.orderStatus} />

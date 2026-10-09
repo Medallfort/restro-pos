@@ -35,7 +35,9 @@ const Menu = () => {
                   {customerData.customerName || "Customer Name"}
                 </h1>
                 <p className="text-xs text-[#ababab] font-medium">
-                  Table : {customerData.table?.tableNo || "N/A"}
+                  {customerData.orderType === "Takeaway"
+                    ? "Takeaway"
+                    : `Table : ${customerData.table?.tableNo || "N/A"}`}
                 </p>
               </div>
             </div>

@@ -5,6 +5,7 @@ import Metrics from "../components/dashboard/Metrics";
 import RecentOrders from "../components/dashboard/RecentOrders";
 import MenuManager from "../components/dashboard/MenuManager";
 import StaffManager from "../components/dashboard/StaffManager";
+import RevenueReport from "../components/dashboard/RevenueReport";
 import Modal from "../components/dashboard/Modal";
 
 const buttons = [
@@ -14,9 +15,10 @@ const buttons = [
 
 const tabs = {
   Metrics: <Metrics />,
+  Revenue: <RevenueReport />,
   Orders: <RecentOrders />,
   Menu: <MenuManager />,
-  Staff: <StaffManager />,
+  Users: <StaffManager />,
 };
 
 const Dashboard = () => {

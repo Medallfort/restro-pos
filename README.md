@@ -22,8 +22,11 @@ npm run dev
 Open http://localhost:5173. `dev:mem` starts an in-memory MongoDB, seeds the menu and 12 tables,
 and runs the API on port 8000 (Vite proxies `/api` to it). Data is wiped when it stops.
 
-**The first account you register becomes Admin.** Every later sign-up starts as Waiter; the admin
-assigns roles from Dashboard → Staff.
+**The first account you register becomes Admin.** Every later sign-up is a Client (customer);
+to add staff, the admin changes their role to Waiter or Cashier from Dashboard → Users.
+
+Create an admin from the command line (or make an existing account Admin and reset its password):
+`npm --prefix backend run create-admin`, or on the server `docker compose exec backend node scripts/create-admin.js`.
 
 ## With a real MongoDB
 
@@ -46,18 +49,27 @@ in Proxmox set the VM's CPU type to `host`.
 
 ## Roles
 
-| Action | Waiter | Cashier | Admin |
-| --- | :-: | :-: | :-: |
-| Create orders, change order status, view tables/orders | ✓ | ✓ | ✓ |
-| Dashboard: add tables & dishes, edit prices, hide dishes | | | ✓ |
-| Dashboard: manage staff roles | | | ✓ |
+| Action | Client | Waiter | Cashier | Admin |
+| --- | :-: | :-: | :-: | :-: |
+| Order dine-in (table number) or takeaway, see own orders | ✓ | ✓ | ✓ | ✓ |
+| View tables, all orders, table history; confirm/cancel orders | | ✓ | ✓ | ✓ |
+| Revenue: Home earnings, Dashboard → Revenue (per table, per waiter) | | | | ✓ |
+| Dashboard: add tables & dishes, edit prices, hide dishes, manage roles | | | | ✓ |
 
 ## Order flow
 
-1. Home → dish button → customer name, phone, guests
-2. Pick an available table
-3. Add dishes to the cart, choose Cash/Online, **Place Order** → receipt
-4. Orders page: *Mark as Ready* → *Complete & free table*
+**Waiter**
+1. Dish button → Dine in (type the table number, or leave it empty to pick a table) or Takeaway
+2. Add dishes to the cart, choose Cash/Online, **Place Order** → receipt (status *In Progress*)
+3. Orders page: *Mark as Ready* → *Complete & free table*
+
+**Client** (from their phone, in the restaurant)
+1. Home → Dine in + table number, or Takeaway → dishes → **Place Order**
+2. The order is *Pending* and books the table; a waiter checks the client is really at that table
+   and taps *Confirm* (or *Cancel*, which frees the table). Pending/cancelled orders don't count as revenue.
+3. The client follows the status in *My Orders*.
+
+A table holds one active order at a time.
 
 Prices and tax are always computed by the server from the database; the amounts shown in
 the cart are only a preview.

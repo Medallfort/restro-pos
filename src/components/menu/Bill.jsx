@@ -29,6 +29,8 @@ const Bill = () => {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const customerData = useSelector((state) => state.customer);
+  const isClient = useSelector((state) => state.user.role === "Client");
+  const isDineIn = customerData.orderType === "Dine In";
   const cartData = useSelector((state) => state.cart);
   const total = useSelector(getTotalPrice);
   const { data: paymentConfig } = usePaymentConfig();
@@ -54,7 +56,12 @@ const Bill = () => {
       guests: customerData.guests,
     },
     items: orderItems,
-    table: customerData.table.tableId,
+    orderType: customerData.orderType,
+    // Table mn page Tables (id) wla numéro li tkteb
+    ...(isDineIn &&
+      (customerData.table.tableId
+        ? { table: customerData.table.tableId }
+        : { tableNo: customerData.table.tableNo })),
     paymentMethod,
     ...(paymentData && { paymentData }),
   });
@@ -70,7 +77,10 @@ const Bill = () => {
       dispatch(removeAllItems());
       setPaymentMethod(undefined);
       ORDER_RELATED_KEYS.forEach((queryKey) => queryClient.invalidateQueries({ queryKey }));
-      enqueueSnackbar("Order Placed!", { variant: "success" });
+      enqueueSnackbar(
+        isClient ? "Order sent! A waiter will confirm it shortly." : "Order Placed!",
+        { variant: "success" }
+      );
     },
     onError: (error) => {
       enqueueSnackbar(getErrorMessage(error), { variant: "error" });
@@ -121,8 +131,12 @@ const Bill = () => {
       enqueueSnackbar("Create an order for a customer first!", { variant: "warning" });
       return;
     }
-    if (!customerData.table || cartData.length === 0) {
-      enqueueSnackbar("Select a table and add items first!", { variant: "warning" });
+    if (isDineIn && !customerData.table) {
+      enqueueSnackbar("Select a table first!", { variant: "warning" });
+      return;
+    }
+    if (cartData.length === 0) {
+      enqueueSnackbar("Add items first!", { variant: "warning" });
       return;
     }
     if (!paymentMethod) {

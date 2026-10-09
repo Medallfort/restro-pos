@@ -2,9 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { getAvatarName, getBgColor } from "../../utils"
 import { useDispatch } from "react-redux";
 import { updateTable } from "../../redux/slices/customerSlice";
-import { FaLongArrowAltRight } from "react-icons/fa";
+import { FaHistory, FaLongArrowAltRight } from "react-icons/fa";
 
-const TableCard = ({id, name, status, initials, seats}) => {
+const TableCard = ({id, name, status, initials, seats, onShowHistory}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleClick = (name) => {
@@ -26,7 +26,19 @@ const TableCard = ({id, name, status, initials, seats}) => {
       <div className="flex items-center justify-center mt-5 mb-8">
         <h1 className={`text-white rounded-full p-5 text-xl`} style={{backgroundColor : initials ? getBgColor() : "#1f1f1f"}} >{getAvatarName(initials) || "N/A"}</h1>
       </div>
-      <p className="text-[#ababab] text-xs">Seats: <span className="text-[#f5f5f5]">{seats}</span></p>
+      <div className="flex items-center justify-between">
+        <p className="text-[#ababab] text-xs">Seats: <span className="text-[#f5f5f5]">{seats}</span></p>
+        <button
+          onClick={(e) => {
+            // Ma n7llouch l-menu: ghir l-historique
+            e.stopPropagation();
+            onShowHistory({ id, name });
+          }}
+          className="text-[#ababab] hover:text-[#f5f5f5] text-xs flex items-center gap-1"
+        >
+          <FaHistory /> History
+        </button>
+      </div>
     </div>
   );
 };

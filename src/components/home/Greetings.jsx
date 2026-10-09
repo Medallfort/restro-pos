@@ -5,7 +5,7 @@ const greeting = (hour) => (hour < 12 ? "Good Morning" : hour < 18 ? "Good After
 
 const Greetings = () => {
   const [dateTime, setDateTime] = useState(new Date());
-  const userName = useSelector((state) => state.user.name);
+  const { name: userName, role } = useSelector((state) => state.user);
 
   useEffect(() => {
     const interval = setInterval(() => setDateTime(new Date()), 1000);
@@ -28,7 +28,9 @@ const Greetings = () => {
     <div className="flex justify-between items-center px-8 mt-5">
       <div>
         <h1 className="text-2xl font-semibold text-[#f5f5f5] tracking-wide">{greeting(dateTime.getHours())}, {userName}</h1>
-        <p className="text-[#ababab] text-sm">Give your best services for your customers!</p>
+        <p className="text-[#ababab] text-sm">
+          {role === "Client" ? "Welcome! What would you like to eat today?" : "Give your best services for your customers!"}
+        </p>
       </div>
       <div>
         <h1 className="text-3xl font-bold text-[#f5f5f5] tracking-wide w-[130px]">{formatTime(dateTime)}</h1>

@@ -5,7 +5,8 @@ import {
   useLocation,
   Navigate,
 } from "react-router-dom";
-import { Home, Auth, Orders, Tables, Menu, Dashboard } from "./pages";
+import { Home, Auth, Orders, Tables, Menu, Dashboard, ClientHome, MyOrders } from "./pages";
+import { STAFF_ROLES } from "./constants";
 import Header from "./components/shared/Header";
 import { useSelector } from "react-redux";
 import useLoadData from "./hooks/useLoadData";
@@ -15,7 +16,9 @@ function Layout() {
   const isLoading = useLoadData();
   const location = useLocation();
   const hideHeaderRoutes = ["/auth"];
-  const { isAuth } = useSelector(state => state.user);
+  const { isAuth, role } = useSelector(state => state.user);
+  // Client 3ndo pages dyalo: commande jdida w "Mes commandes"
+  const isClient = role === "Client";
 
   if(isLoading) return <FullScreenLoader />
 
@@ -27,7 +30,7 @@ function Layout() {
           path="/"
           element={
             <ProtectedRoutes>
-              <Home />
+              {isClient ? <ClientHome /> : <Home />}
             </ProtectedRoutes>
           }
         />
@@ -36,14 +39,14 @@ function Layout() {
           path="/orders"
           element={
             <ProtectedRoutes>
-              <Orders />
+              {isClient ? <MyOrders /> : <Orders />}
             </ProtectedRoutes>
           }
         />
         <Route
           path="/tables"
           element={
-            <ProtectedRoutes>
+            <ProtectedRoutes roles={STAFF_ROLES}>
               <Tables />
             </ProtectedRoutes>
           }

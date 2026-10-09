@@ -16,6 +16,7 @@ export const updateUserRole = ({ userId, role }) =>
 // Table Endpoints
 export const addTable = (data) => axiosWrapper.post("/api/table/", data);
 export const getTables = () => axiosWrapper.get("/api/table");
+export const getTableHistory = (tableId) => axiosWrapper.get(`/api/table/${tableId}/history`);
 export const updateTable = ({ tableId, ...tableData }) =>
   axiosWrapper.put(`/api/table/${tableId}`, tableData);
 
@@ -35,11 +36,14 @@ export const verifyPaymentRazorpay = (data) =>
 // Order Endpoints
 export const addOrder = (data) => axiosWrapper.post("/api/order/", data);
 export const getOrders = () => axiosWrapper.get("/api/order");
+export const getMyOrders = () => axiosWrapper.get("/api/order/mine");
 export const updateOrderStatus = ({ orderId, orderStatus }) =>
   axiosWrapper.put(`/api/order/${orderId}`, { orderStatus });
 
 // Stats
 export const getStats = () => axiosWrapper.get("/api/stats");
+export const getRevenueReport = (period) =>
+  axiosWrapper.get("/api/stats/revenue", { params: { period } });
 
 export const getErrorMessage = (error) =>
   error?.response?.data?.message ?? "Server unreachable!";

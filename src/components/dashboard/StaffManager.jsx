@@ -24,8 +24,8 @@ const StaffManager = () => {
 
   return (
     <div className="container mx-auto bg-[#262626] p-4 rounded-lg">
-      <h2 className="text-[#f5f5f5] text-xl font-semibold mb-1">Staff</h2>
-      <p className="text-sm text-[#ababab] mb-4">New sign-ups start as Waiter. Assign their role here.</p>
+      <h2 className="text-[#f5f5f5] text-xl font-semibold mb-1">Users</h2>
+      <p className="text-sm text-[#ababab] mb-4">New sign-ups are Clients. To add a waiter or cashier, change their role here.</p>
       <table className="w-full text-left text-[#f5f5f5]">
         <thead className="bg-[#333] text-[#ababab]">
           <tr>

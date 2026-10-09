@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { motion } from "framer-motion";
 import { FaCheck } from "react-icons/fa6";
-import { formatPrice } from "../../utils";
+import { formatPrice, orderLabel } from "../../utils";
 
 const Invoice = ({ orderInfo, setShowInvoice }) => {
   const invoiceRef = useRef(null);
@@ -67,6 +67,9 @@ const Invoice = ({ orderInfo, setShowInvoice }) => {
             <p>
               <strong>Order ID:</strong>{" "}
               {Math.floor(new Date(orderInfo.orderDate).getTime())}
+            </p>
+            <p>
+              <strong>Type:</strong> {orderLabel(orderInfo)}
             </p>
             <p>
               <strong>Name:</strong> {orderInfo.customerDetails.name}

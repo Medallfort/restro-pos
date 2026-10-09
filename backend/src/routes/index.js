@@ -1,17 +1,20 @@
 import { Router } from "express";
 import { requireAuth, requireRole } from "../middleware/auth.js";
 import { authLimiter } from "../middleware/rateLimiters.js";
-import { validateBody, validateObjectId } from "../middleware/validate.js";
+import { validateBody, validateObjectId, validateQuery } from "../middleware/validate.js";
 import * as schemas from "../validators/schemas.js";
 import * as users from "../controllers/userController.js";
 import * as tables from "../controllers/tableController.js";
 import * as orders from "../controllers/orderController.js";
 import * as payments from "../controllers/paymentController.js";
 import * as menu from "../controllers/menuController.js";
-import { getStats } from "../controllers/statsController.js";
+import { getRevenueReport, getStats } from "../controllers/statsController.js";
+import { STAFF_ROLES } from "../models/User.js";
 
 const router = Router();
 const adminOnly = requireRole("Admin");
+// Client ma y9derch ychouf tables, commandes dyal nas w stats
+const staffOnly = requireRole(...STAFF_ROLES);
 
 // Auth (public)
 router.post("/user/register", authLimiter, validateBody(schemas.registerSchema), users.register);
@@ -31,10 +34,12 @@ router.put(
   users.updateRole
 );
 
-router.get("/table", tables.listTables);
+router.get("/table", staffOnly, tables.listTables);
+router.get("/table/:id/history", staffOnly, validateObjectId(), tables.getTableHistory);
 router.post("/table", adminOnly, validateBody(schemas.createTableSchema), tables.createTable);
 router.put(
   "/table/:id",
+  staffOnly,
   validateObjectId(),
   validateBody(schemas.updateTableSchema),
   tables.updateTable
@@ -50,16 +55,24 @@ router.put(
   menu.updateMenuItem
 );
 
-router.get("/order", orders.listOrders);
+router.get("/order", staffOnly, orders.listOrders);
+router.get("/order/mine", orders.listMyOrders);
 router.post("/order", validateBody(schemas.createOrderSchema), orders.createOrder);
 router.put(
   "/order/:id",
+  staffOnly,
   validateObjectId(),
   validateBody(schemas.updateOrderStatusSchema),
   orders.updateOrderStatus
 );
 
-router.get("/stats", getStats);
+router.get("/stats", staffOnly, getStats);
+router.get(
+  "/stats/revenue",
+  adminOnly,
+  validateQuery(schemas.revenueQuerySchema),
+  getRevenueReport
+);
 
 router.get("/payment/config", payments.getPaymentConfig);
 router.post(

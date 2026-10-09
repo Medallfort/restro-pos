@@ -6,7 +6,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
 COPY src ./src
-COPY scripts/seed.js ./scripts/seed.js
+COPY scripts/seed.js scripts/create-admin.js ./scripts/
 
 # Machi root: ila t-exploita l-app, ma y9derch ybeddel l-container
 USER node

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { z } from "zod";
 import { ROLES } from "../models/User.js";
 import { TABLE_STATUSES } from "../models/Table.js";
-import { ORDER_STATUSES, PAYMENT_METHODS } from "../models/Order.js";
+import { ORDER_STATUSES, ORDER_TYPES, PAYMENT_METHODS } from "../models/Order.js";
 
 const objectId = z.string().refine((value) => mongoose.isValidObjectId(value), "Invalid id");
 
@@ -40,22 +40,35 @@ const orderItem = z.object({
   quantity: z.coerce.number().int().min(1).max(20),
 });
 
-export const createOrderSchema = z.object({
-  customerDetails: z.object({
-    name: z.string().trim().min(1).max(60),
-    phone: z.string().trim().max(20).optional().default(""),
-    guests: z.coerce.number().int().min(1).max(20),
-  }),
-  items: z.array(orderItem).min(1).max(50),
-  table: objectId,
-  paymentMethod: z.enum(PAYMENT_METHODS),
-  paymentData: z
-    .object({
-      razorpay_order_id: z.string().max(100),
-      razorpay_payment_id: z.string().max(100),
-    })
-    .optional(),
-  // "bills" w "orderStatus" li jaw mn l-client kayt-ignoraw: server howa li kay7sebhom
+export const createOrderSchema = z
+  .object({
+    customerDetails: z.object({
+      // Client: smiya w tel kayjiw mn compte dyalo (server kay-ignori dakchi li tsift)
+      name: z.string().trim().min(1).max(60),
+      phone: z.string().trim().max(20).optional().default(""),
+      guests: z.coerce.number().int().min(1).max(20),
+    }),
+    items: z.array(orderItem).min(1).max(50),
+    orderType: z.enum(ORDER_TYPES).default("Dine In"),
+    // Table b id (page Tables) wla b numéro (serveur/client kaykteb numéro)
+    table: objectId.optional(),
+    tableNo: z.coerce.number().int().min(1).max(999).optional(),
+    paymentMethod: z.enum(PAYMENT_METHODS),
+    paymentData: z
+      .object({
+        razorpay_order_id: z.string().max(100),
+        razorpay_payment_id: z.string().max(100),
+      })
+      .optional(),
+    // "bills" w "orderStatus" li jaw mn l-client kayt-ignoraw: server howa li kay7sebhom
+  })
+  .refine((order) => order.orderType === "Takeaway" || order.table || order.tableNo, {
+    message: "Table number is required for dine-in orders",
+    path: ["tableNo"],
+  });
+
+export const revenueQuerySchema = z.object({
+  period: z.enum(["today", "week", "month", "all"]).default("today"),
 });
 
 export const updateOrderStatusSchema = z.object({ orderStatus: z.enum(ORDER_STATUSES) });

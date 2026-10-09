@@ -1,5 +1,5 @@
 import Table from "../models/Table.js";
-import Order from "../models/Order.js";
+import Order, { BILLABLE_STATUSES } from "../models/Order.js";
 import AppError from "../utils/AppError.js";
 
 export async function createTable(req, res) {
@@ -29,4 +29,45 @@ export async function updateTable(req, res) {
 
   await table.save();
   res.json({ success: true, message: "Table updated", data: table });
+}
+
+// Historique dyal table: ga3 les commandes li dazo 3liha + résumé (ch7al, chiffre d'affaires...)
+export async function getTableHistory(req, res) {
+  const table = await Table.findById(req.params.id);
+  if (!table) throw new AppError(404, "Table not found");
+
+  const [orders, [summary]] = await Promise.all([
+    Order.find({ table: table._id })
+      .sort({ createdAt: -1 })
+      .limit(100)
+      .populate("servedBy", "name"),
+    // Résumé: ghir les commandes confirmées (machi Pending wla Cancelled)
+    Order.aggregate([
+      { $match: { table: table._id, orderStatus: { $in: BILLABLE_STATUSES } } },
+      {
+        $group: {
+          _id: null,
+          ordersCount: { $sum: 1 },
+          revenue: { $sum: "$bills.totalWithTax" },
+          guests: { $sum: "$customerDetails.guests" },
+          lastOrderAt: { $max: "$createdAt" },
+        },
+      },
+    ]),
+  ]);
+
+  res.json({
+    success: true,
+    data: {
+      table,
+      summary: {
+        ordersCount: summary?.ordersCount ?? 0,
+        revenue: summary?.revenue ?? 0,
+        guests: summary?.guests ?? 0,
+        lastOrderAt: summary?.lastOrderAt ?? null,
+        since: table.createdAt,
+      },
+      orders,
+    },
+  });
 }
