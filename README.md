@@ -44,7 +44,20 @@ docker compose up -d --build
 docker compose exec backend node scripts/seed.js
 ```
 
-App on port 80. MongoDB data lives in the `mongo-data` volume. MongoDB 5+ needs a CPU with AVX:
+App on port 80. MongoDB data lives in the `mongo-data` volume.
+
+**Backups** (run from the project folder on the server):
+
+```bash
+./deploy/backup.sh                      # dump to backups/, keeps the last 14 days
+./deploy/restore.sh                     # list backups
+./deploy/restore.sh backups/<file>      # restore (asks first, saves current data before)
+```
+
+Nightly at 03:00: `crontab -e` and add
+`0 3 * * * /home/amine/restro-pos/deploy/backup.sh >> /home/amine/restro-pos/backups/backup.log 2>&1`.
+Also copy `backups/` off the VM from time to time (a disk failure takes the VM and its backups).
+ MongoDB 5+ needs a CPU with AVX:
 in Proxmox set the VM's CPU type to `host`.
 
 ## Roles
