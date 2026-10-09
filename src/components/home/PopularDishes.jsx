@@ -6,7 +6,7 @@ const PopularDishes = () => {
   const dishes = stats?.popularDishes ?? [];
 
   return (
-    <div className="mt-6 pr-6">
+    <div className="mt-6 px-4 lg:pl-0 lg:pr-6">
       <div className="bg-[#1a1a1a] w-full rounded-lg">
         <div className="flex justify-between items-center px-6 py-4">
           <h1 className="text-[#f5f5f5] text-lg font-semibold tracking-wide">
@@ -15,7 +15,7 @@ const PopularDishes = () => {
           <span className="text-[#ababab] text-sm">By quantity ordered</span>
         </div>
 
-        <div className="overflow-y-scroll h-[680px] scrollbar-hide">
+        <div className="overflow-y-scroll max-h-[400px] lg:max-h-none lg:h-[680px] scrollbar-hide pb-4">
           {dishes.length === 0 && (
             <p className="text-[#ababab] px-6 py-4">No orders yet. Popular dishes will show up here.</p>
           )}

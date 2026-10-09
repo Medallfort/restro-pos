@@ -32,19 +32,19 @@ const Tables = () => {
 
   return (
     <section className="bg-[#1f1f1f]  h-[calc(100vh-5rem)] overflow-hidden">
-      <div className="flex items-center justify-between px-10 py-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 px-4 md:px-10 py-4">
         <div className="flex items-center gap-4">
           <BackButton />
           <h1 className="text-[#f5f5f5] text-2xl font-bold tracking-wider">
             Tables
           </h1>
         </div>
-        <div className="flex items-center justify-around gap-4">
+        <div className="flex items-center gap-1 md:gap-4">
           {filters.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setStatus(key)}
-              className={`text-[#ababab] text-lg ${status === key ? "bg-[#383838]" : ""} rounded-lg px-5 py-2 font-semibold`}
+              className={`text-[#ababab] text-sm md:text-lg whitespace-nowrap ${status === key ? "bg-[#383838]" : ""} rounded-lg px-3 md:px-5 py-2 font-semibold`}
             >
               {label}
             </button>
@@ -52,9 +52,9 @@ const Tables = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-5 gap-3 px-16 py-4 h-[650px] overflow-y-scroll scrollbar-hide content-start">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 px-4 md:px-16 py-4 pb-24 h-[calc(100vh-12rem)] overflow-y-scroll scrollbar-hide content-start">
         {visibleTables.length === 0 && (
-          <p className="col-span-5 text-gray-500">No tables. An admin can add them from the dashboard.</p>
+          <p className="col-span-full text-gray-500">No tables. An admin can add them from the dashboard.</p>
         )}
         {visibleTables.map((table) => {
           return (

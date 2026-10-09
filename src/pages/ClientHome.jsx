@@ -16,10 +16,10 @@ const ClientHome = () => {
   const active = orders.filter((o) => !["Completed", "Cancelled"].includes(o.orderStatus));
 
   return (
-    <section className="bg-[#1f1f1f] h-[calc(100vh-5rem)] overflow-y-auto pb-24 flex gap-3">
+    <section className="bg-[#1f1f1f] h-[calc(100vh-5rem)] overflow-y-auto pb-24 flex flex-col lg:flex-row gap-3">
       <div className="flex-[3]">
         <Greetings />
-        <div className="bg-[#1a1a1a] rounded-lg p-6 mx-8 mt-8 max-w-xl">
+        <div className="bg-[#1a1a1a] rounded-lg p-4 md:p-6 mx-4 md:mx-8 mt-6 md:mt-8 max-w-xl">
           <h2 className="text-[#f5f5f5] text-xl font-semibold">New order</h2>
           <p className="text-[#ababab] text-sm mb-4">
             Eating here? Enter your table number. Taking it away? Choose Takeaway.
@@ -28,7 +28,7 @@ const ClientHome = () => {
         </div>
       </div>
 
-      <div className="flex-[2] px-6 mt-6">
+      <div className="flex-[2] px-4 md:px-6 mt-2 lg:mt-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-[#f5f5f5] text-lg font-semibold">Current orders</h2>
           <Link to="/orders" className="text-[#025cca] text-sm font-semibold">

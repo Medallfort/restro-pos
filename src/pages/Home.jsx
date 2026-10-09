@@ -22,11 +22,11 @@ const Home = () => {
   const isAdmin = useSelector((state) => state.user.role === "Admin");
 
   return (
-    <section className="bg-[#1f1f1f]  h-[calc(100vh-5rem)] overflow-hidden flex gap-3">
+    <section className="bg-[#1f1f1f] h-[calc(100vh-5rem)] overflow-y-auto lg:overflow-hidden pb-24 lg:pb-0 flex flex-col lg:flex-row gap-3">
       {/* Left Div */}
       <div className="flex-[3]">
         <Greetings />
-        <div className="flex items-center w-full gap-3 px-8 mt-8">
+        <div className="flex items-center w-full gap-3 px-4 md:px-8 mt-6 md:mt-8">
           {isAdmin ? (
             <MiniCard
               title="Today's Earnings"

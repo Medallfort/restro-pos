@@ -33,19 +33,19 @@ const Orders = () => {
 
   return (
     <section className="bg-[#1f1f1f]  h-[calc(100vh-5rem)] overflow-hidden">
-      <div className="flex items-center justify-between px-10 py-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 px-4 md:px-10 py-4">
         <div className="flex items-center gap-4">
           <BackButton />
           <h1 className="text-[#f5f5f5] text-2xl font-bold tracking-wider">
             Orders
           </h1>
         </div>
-        <div className="flex items-center justify-around gap-4">
+        <div className="flex items-center gap-1 md:gap-4 overflow-x-auto scrollbar-hide">
           {filters.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setStatus(key)}
-              className={`text-[#ababab] text-lg ${status === key ? "bg-[#383838]" : ""} rounded-lg px-5 py-2 font-semibold`}
+              className={`text-[#ababab] text-sm md:text-lg whitespace-nowrap ${status === key ? "bg-[#383838]" : ""} rounded-lg px-3 md:px-5 py-2 font-semibold`}
             >
               {label}
             </button>
@@ -53,7 +53,7 @@ const Orders = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 px-16 py-4 h-[calc(100vh-14rem)] overflow-y-scroll scrollbar-hide content-start">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 px-4 md:px-16 py-4 pb-24 h-[calc(100vh-14rem)] overflow-y-scroll scrollbar-hide content-start">
         {
           visibleOrders.length > 0 ? (
             visibleOrders.map((order) => {

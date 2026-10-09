@@ -24,13 +24,13 @@ const CartInfo = () => {
   }
 
   return (
-    <div className="px-4 py-2">
+    <div className="px-4 py-2 flex flex-col lg:flex-1 lg:min-h-0">
       <h1 className="text-lg text-[#e4e4e4] font-semibold tracking-wide">
         Order Details
       </h1>
-      <div className="mt-4 overflow-y-scroll scrollbar-hide h-[380px]" ref={scrolLRef} >
+      <div className="mt-4 overflow-y-scroll scrollbar-hide max-h-64 lg:max-h-none lg:flex-1" ref={scrolLRef} >
         {cartData.length === 0 ? (
-          <p className="text-[#ababab] text-sm flex justify-center items-center h-[380px]">Your cart is empty. Start adding items!</p>
+          <p className="text-[#ababab] text-sm flex justify-center items-center h-24 lg:h-full">Your cart is empty. Start adding items!</p>
         ) : cartData.map((item) => {
           return (
             <div key={item.id} className="bg-[#1f1f1f] rounded-lg px-4 py-4 mb-2">

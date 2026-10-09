@@ -49,17 +49,17 @@ const MenuContainer = () => {
 
   return (
     <>
-      <div className="grid grid-cols-4 gap-4 px-10 py-4 w-[100%]">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 px-4 md:px-10 py-4 w-[100%]">
         {menus.map((menu) => {
           return (
             <div
               key={menu.name}
-              className="flex flex-col items-start justify-between p-4 rounded-lg h-[100px] cursor-pointer"
+              className="flex flex-col items-start justify-between p-3 md:p-4 rounded-lg h-[80px] md:h-[100px] cursor-pointer"
               style={{ backgroundColor: menu.bgColor }}
               onClick={() => setSelectedName(menu.name)}
             >
               <div className="flex items-center justify-between w-full">
-                <h1 className="text-[#f5f5f5] text-lg font-semibold">
+                <h1 className="text-[#f5f5f5] text-sm md:text-lg font-semibold">
                   {menu.icon} {menu.name}
                 </h1>
                 {selected?.name === menu.name && (
@@ -76,12 +76,12 @@ const MenuContainer = () => {
 
       <hr className="border-[#2a2a2a] border-t-2 mt-4" />
 
-      <div className="grid grid-cols-4 gap-4 px-10 py-4 w-[100%] overflow-y-scroll scrollbar-hide max-h-[440px]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 px-4 md:px-10 py-4 w-[100%] lg:overflow-y-scroll scrollbar-hide lg:max-h-[calc(100vh-24rem)]">
         {selected?.items.map((item) => {
           return (
             <div
               key={item._id}
-              className="flex flex-col items-start justify-between p-4 rounded-lg h-[150px] cursor-pointer hover:bg-[#2a2a2a] bg-[#1a1a1a]"
+              className="flex flex-col items-start justify-between gap-3 p-4 rounded-lg min-h-[120px] md:h-[150px] cursor-pointer hover:bg-[#2a2a2a] bg-[#1a1a1a]"
             >
               <div className="flex items-start justify-between w-full">
                 <h1 className="text-[#f5f5f5] text-lg font-semibold">
@@ -93,7 +93,7 @@ const MenuContainer = () => {
                 <p className="text-[#f5f5f5] text-xl font-bold">
                   {formatPrice(item.price)}
                 </p>
-                <div className="flex items-center justify-between bg-[#1f1f1f] px-4 py-3 rounded-lg gap-6 w-[50%]">
+                <div className="flex items-center justify-between bg-[#1f1f1f] px-4 py-2 md:py-3 rounded-lg gap-4 md:gap-6 w-[50%]">
                   <button
                     onClick={() => changeCount(item._id, -1)}
                     className="text-yellow-500 text-2xl"

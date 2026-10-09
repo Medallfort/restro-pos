@@ -32,7 +32,7 @@ const Header = () => {
   };
 
   return (
-    <header className="flex justify-between items-center py-4 px-8 bg-[#1a1a1a]">
+    <header className="flex justify-between items-center gap-3 py-3 md:py-4 px-4 md:px-8 bg-[#1a1a1a]">
       {/* LOGO */}
       <div onClick={() => navigate("/")} className="flex items-center gap-2 cursor-pointer">
         <img src={logo} className="h-8 w-8" alt="restro logo" />
@@ -42,7 +42,7 @@ const Header = () => {
       </div>
 
       {/* SEARCH */}
-      <div className="flex items-center gap-4 bg-[#1f1f1f] rounded-[15px] px-5 py-2 w-[500px]">
+      <div className="hidden lg:flex items-center gap-4 bg-[#1f1f1f] rounded-[15px] px-5 py-2 w-[500px]">
         <FaSearch className="text-[#f5f5f5]" />
         <input
           type="text"
@@ -52,17 +52,17 @@ const Header = () => {
       </div>
 
       {/* LOGGED USER DETAILS */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 md:gap-4">
         {userData.role === "Admin" && (
           <div onClick={() => navigate("/dashboard")} className="bg-[#1f1f1f] rounded-[15px] p-3 cursor-pointer">
             <MdDashboard className="text-[#f5f5f5] text-2xl" />
           </div>
         )}
-        <div className="bg-[#1f1f1f] rounded-[15px] p-3 cursor-pointer">
+        <div className="hidden md:block bg-[#1f1f1f] rounded-[15px] p-3 cursor-pointer">
           <FaBell className="text-[#f5f5f5] text-2xl" />
         </div>
         <div className="flex items-center gap-3 cursor-pointer">
-          <FaUserCircle className="text-[#f5f5f5] text-4xl" />
+          <FaUserCircle className="hidden sm:block text-[#f5f5f5] text-4xl" />
           <div className="flex flex-col items-start">
             <h1 className="text-md text-[#f5f5f5] font-semibold tracking-wide">
               {userData.name || "TEST USER"}
@@ -73,8 +73,7 @@ const Header = () => {
           </div>
           <IoLogOut
             onClick={handleLogout}
-            className="text-[#f5f5f5] ml-2"
-            size={40}
+            className="text-[#f5f5f5] ml-1 md:ml-2 text-3xl md:text-[40px]"
           />
         </div>
       </div>

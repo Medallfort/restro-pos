@@ -34,8 +34,8 @@ const Invoice = ({ orderInfo, setShowInvoice }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-4 rounded-lg shadow-lg w-[400px]">
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center p-4">
+      <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-[400px] max-h-full overflow-y-auto">
         {/* Receipt Content for Printing */}
 
         <div ref={invoiceRef} className="p-4">
