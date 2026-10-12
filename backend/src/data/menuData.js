@@ -3,63 +3,67 @@ const section = (category, items) => items.map(([name, price]) => ({ name, categ
 
 export const MENU_ITEMS = [
   ...section("Starters", [
-    ["Paneer Tikka", 250],
-    ["Chicken Tikka", 300],
-    ["Tandoori Chicken", 350],
-    ["Samosa", 100],
-    ["Aloo Tikki", 120],
-    ["Hara Bhara Kebab", 220],
-  ]),
-  ...section("Main Course", [
-    ["Butter Chicken", 400],
-    ["Paneer Butter Masala", 350],
-    ["Chicken Biryani", 450],
-    ["Dal Makhani", 180],
-    ["Kadai Paneer", 300],
-    ["Rogan Josh", 500],
-  ]),
-  ...section("Beverages", [
-    ["Masala Chai", 50],
-    ["Lemon Soda", 80],
-    ["Mango Lassi", 120],
-    ["Cold Coffee", 150],
-    ["Fresh Lime Water", 60],
-    ["Iced Tea", 100],
+    ["Salade Marocaine", 25],
+    ["Zaalouk", 25],
+    ["Taktouka", 25],
+    ["Briouates Kefta", 35],
   ]),
   ...section("Soups", [
-    ["Tomato Soup", 120],
-    ["Sweet Corn Soup", 130],
-    ["Hot & Sour Soup", 140],
-    ["Chicken Clear Soup", 160],
-    ["Mushroom Soup", 150],
-    ["Lemon Coriander Soup", 110],
+    ["Harira", 20],
+    ["Bissara", 15],
   ]),
-  ...section("Desserts", [
-    ["Gulab Jamun", 100],
-    ["Kulfi", 150],
-    ["Chocolate Lava Cake", 250],
-    ["Ras Malai", 180],
+  ...section("Tagines", [
+    ["Tajine Poulet Citron", 75],
+    ["Tajine Kefta aux Oeufs", 65],
+    ["Tajine Agneau Pruneaux", 95],
+    ["Tajine Poisson", 85],
+  ]),
+  ...section("Couscous", [
+    ["Couscous Sept Légumes", 70],
+    ["Couscous Poulet Tfaya", 85],
+    ["Seffa Medfouna", 80],
+  ]),
+  ...section("Specialties", [
+    ["Pastilla Poulet", 80],
+    ["Pastilla Fruits de Mer", 95],
+    ["Rfissa", 85],
+    ["Tanjia Marrakchia", 110],
+    ["Méchoui", 120],
+  ]),
+  ...section("Grills", [
+    ["Brochettes Kefta", 60],
+    ["Brochettes Poulet", 55],
   ]),
   ...section("Pizzas", [
-    ["Margherita Pizza", 350],
-    ["Veg Supreme Pizza", 400],
-    ["Pepperoni Pizza", 450],
+    ["Margherita Pizza", 60],
+    ["Veg Supreme Pizza", 70],
+    ["Pepperoni Pizza", 80],
   ]),
-  ...section("Alcoholic Drinks", [
-    ["Beer", 200],
-    ["Whiskey", 500],
-    ["Vodka", 450],
-    ["Rum", 350],
-    ["Tequila", 600],
-    ["Cocktail", 400],
+  ...section("Desserts", [
+    ["Chebakia", 20],
+    ["Cornes de Gazelle", 30],
+    ["Baghrir au Miel", 20],
+    ["Msemen au Miel", 20],
   ]),
-  ...section("Salads", [
-    ["Caesar Salad", 200],
-    ["Greek Salad", 250],
-    ["Fruit Salad", 150],
-    ["Chicken Salad", 300],
-    ["Tuna Salad", 350],
+  ...section("Beverages", [
+    ["Thé à la Menthe", 15],
+    ["Jus d'Orange", 20],
+    ["Jus d'Avocat", 30],
+    ["Café Noss Noss", 15],
+    ["Eau Minérale", 10],
   ]),
+];
+
+// Menu l9dim (hindi). Seed kaykhbih (isActive: false) bla ma ymse7o: les commandes l9dam
+// w l-revenue mrbotin b had les plats. Admin y9der y3awd y-activi chi wa7d mn Dashboard.
+export const RETIRED_MENU_ITEMS = [
+  "Paneer Tikka", "Chicken Tikka", "Tandoori Chicken", "Samosa", "Aloo Tikki", "Hara Bhara Kebab",
+  "Butter Chicken", "Paneer Butter Masala", "Chicken Biryani", "Dal Makhani", "Kadai Paneer",
+  "Rogan Josh", "Masala Chai", "Lemon Soda", "Mango Lassi", "Cold Coffee", "Fresh Lime Water",
+  "Iced Tea", "Tomato Soup", "Sweet Corn Soup", "Hot & Sour Soup", "Chicken Clear Soup",
+  "Mushroom Soup", "Lemon Coriander Soup", "Gulab Jamun", "Kulfi", "Chocolate Lava Cake",
+  "Ras Malai", "Beer", "Whiskey", "Vodka", "Rum", "Tequila", "Cocktail", "Caesar Salad",
+  "Greek Salad", "Fruit Salad", "Chicken Salad", "Tuna Salad",
 ];
 
 export const TABLES = Array.from({ length: 12 }, (_, i) => ({

@@ -117,7 +117,7 @@ describe("Live updates (SSE)", () => {
       .send({
         customerDetails: { name: "Client", guests: 1 },
         orderType: "Takeaway",
-        items: [{ name: "Samosa", quantity: 1 }],
+        items: [{ name: "Harira", quantity: 1 }],
         paymentMethod: "Cash",
       })
       .expect(201);

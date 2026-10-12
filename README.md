@@ -1,6 +1,6 @@
 # Restro POS
 
-Restaurant point-of-sale: tables, menu, orders, receipts, admin dashboard.
+Restaurant point-of-sale: tables, menu, orders, receipts, admin dashboard. Ships with a Moroccan menu (photos credited in `src/assets/images/menu/CREDITS.md`).
 
 - **Frontend**: React 19 + Vite, Redux Toolkit (cart/customer), TanStack Query (server data), Tailwind
 - **Backend** (`backend/`): Express 5 + MongoDB (Mongoose), JWT in an httpOnly cookie, Zod validation
@@ -41,7 +41,7 @@ npm --prefix backend run dev
 ```bash
 cp backend/.env.example backend/.env   # set JWT_SECRET; COOKIE_SECURE=false if served over plain HTTP
 docker compose up -d --build
-docker compose exec backend node scripts/seed.js
+docker compose exec backend node scripts/seed.js   # also hides the old (Indian) demo menu, keeps its orders
 ```
 
 App on port 80. MongoDB data lives in the `mongo-data` volume.

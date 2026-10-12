@@ -1,6 +1,7 @@
 import Table from "../models/Table.js";
 import Order, { BILLABLE_STATUSES } from "../models/Order.js";
 import AppError from "../utils/AppError.js";
+import { round2 } from "../utils/money.js";
 import { notifyTables } from "../realtime/events.js";
 
 export async function createTable(req, res) {
@@ -65,7 +66,8 @@ export async function getTableHistory(req, res) {
       table,
       summary: {
         ordersCount: summary?.ordersCount ?? 0,
-        revenue: summary?.revenue ?? 0,
+        // $sum dyal decimals kay3ti 347.33000000000004
+        revenue: round2(summary?.revenue ?? 0),
         guests: summary?.guests ?? 0,
         lastOrderAt: summary?.lastOrderAt ?? null,
         since: table.createdAt,

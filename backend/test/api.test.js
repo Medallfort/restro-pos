@@ -6,6 +6,7 @@ import request from "supertest";
 let mongo;
 let app;
 let disconnectDB;
+let seedDatabase;
 
 // env.js kay9ra process.env f l-import, donc khass n7ddedouh 9bel
 before(async () => {
@@ -19,7 +20,7 @@ before(async () => {
 
   const db = await import("../src/config/db.js");
   const { createApp } = await import("../src/app.js");
-  const { seedDatabase } = await import("../src/data/seed.js");
+  ({ seedDatabase } = await import("../src/data/seed.js"));
   disconnectDB = db.disconnectDB;
   await db.connectDB(process.env.MONGODB_URI);
   await seedDatabase();
@@ -93,15 +94,15 @@ describe("Restro POS API", () => {
       .post("/api/order")
       .send({
         customerDetails: { name: "Amine", phone: "", guests: 2 },
-        items: [{ name: "Butter Chicken", quantity: 2, price: 1 }],
+        items: [{ name: "Tanjia Marrakchia", quantity: 2, price: 1 }],
         bills: { total: 1, tax: 0, totalWithTax: 1 },
         table: table._id,
         paymentMethod: "Cash",
       })
       .expect(201);
 
-    assert.deepEqual(res.body.data.bills, { total: 800, tax: 42, totalWithTax: 842 });
-    assert.equal(res.body.data.items[0].pricePerQuantity, 400);
+    assert.deepEqual(res.body.data.bills, { total: 220, tax: 11.55, totalWithTax: 231.55 });
+    assert.equal(res.body.data.items[0].pricePerQuantity, 110);
 
     const after = await waiter.get("/api/table");
     assert.equal(after.body.data[0].status, "Booked");
@@ -111,7 +112,7 @@ describe("Restro POS API", () => {
       .post("/api/order")
       .send({
         customerDetails: { name: "Other", guests: 1 },
-        items: [{ name: "Samosa", quantity: 1 }],
+        items: [{ name: "Harira", quantity: 1 }],
         table: table._id,
         paymentMethod: "Cash",
       })
@@ -150,7 +151,7 @@ describe("Restro POS API", () => {
       .post("/api/order")
       .send({
         customerDetails: { name: "Second", guests: 3 },
-        items: [{ name: "Butter Chicken", quantity: 1 }],
+        items: [{ name: "Tanjia Marrakchia", quantity: 1 }],
         table: table._id,
         paymentMethod: "Cash",
       })
@@ -159,7 +160,7 @@ describe("Restro POS API", () => {
     const { body } = await waiter.get(`/api/table/${table._id}/history`).expect(200);
     assert.equal(body.data.summary.ordersCount, 2);
     assert.equal(body.data.summary.guests, 5);
-    assert.equal(body.data.summary.revenue, 842 + 421);
+    assert.equal(body.data.summary.revenue, 347.33);
     assert.deepEqual(
       body.data.orders.map((o) => o.customerDetails.name),
       ["Second", "Amine"]
@@ -178,10 +179,10 @@ describe("Restro POS API", () => {
     const { body } = await waiter.get("/api/stats").expect(200);
     assert.equal(body.data.todayOrders, 2);
     assert.equal(body.data.todayRevenue, undefined);
-    assert.equal(body.data.popularDishes[0].name, "Butter Chicken");
+    assert.equal(body.data.popularDishes[0].name, "Tanjia Marrakchia");
 
     const { body: adminStats } = await admin.get("/api/stats").expect(200);
-    assert.equal(adminStats.data.todayRevenue, 842 + 421);
+    assert.equal(adminStats.data.todayRevenue, 347.33);
   });
 
   describe("client orders", () => {
@@ -197,7 +198,7 @@ describe("Restro POS API", () => {
 
     const clientOrder = (extra) => ({
       customerDetails: { name: "Fake name", phone: "000", guests: 2 },
-      items: [{ name: "Samosa", quantity: 2 }],
+      items: [{ name: "Harira", quantity: 2 }],
       paymentMethod: "Cash",
       ...extra,
     });
@@ -231,7 +232,7 @@ describe("Restro POS API", () => {
       // Pending ma kat7sbch f chiffre d'affaires
       const { body: stats } = await admin.get("/api/stats");
       assert.equal(stats.data.pending, 1);
-      assert.equal(stats.data.todayRevenue, 842 + 421);
+      assert.equal(stats.data.todayRevenue, 347.33);
     });
 
     test("dine-in needs a valid table number, takeaway does not", async () => {
@@ -291,9 +292,9 @@ describe("Restro POS API", () => {
       const { body } = await admin.get("/api/stats/revenue?period=today").expect(200);
       const report = body.data;
 
-      // 842 + 421 (waiter, Table 1) + 210.5 (takeaway confirmé). Cancelled ma kat7sbch
+      // 231.55 + 115.78 (waiter, Table 1) + 42.1 (takeaway confirmé). Cancelled ma kat7sbch
       assert.equal(report.totals.orders, 3);
-      assert.equal(report.totals.revenue, 842 + 421 + 210.5);
+      assert.equal(report.totals.revenue, 389.43);
 
       assert.equal(report.byTable.length, 1);
       assert.equal(report.byTable[0].tableNo, tables[0].tableNo);
@@ -313,10 +314,10 @@ describe("Restro POS API", () => {
   test("admin can add dishes and manage roles", async () => {
     await admin
       .post("/api/menu")
-      .send({ name: "Harira", category: "Soups", price: 40 })
+      .send({ name: "Pastilla au Lait", category: "Desserts", price: 35 })
       .expect(201);
     const { body: menu } = await waiter.get("/api/menu");
-    assert.ok(menu.data.some((item) => item.name === "Harira"));
+    assert.ok(menu.data.some((item) => item.name === "Pastilla au Lait"));
 
     const { body: users } = await admin.get("/api/user/all").expect(200);
     const target = users.data.find((u) => u.email === user(2).email);
@@ -324,12 +325,30 @@ describe("Restro POS API", () => {
     assert.equal((await waiter.get("/api/user")).body.data.role, "Cashier");
   });
 
+  test("re-running the seed hides the old menu but keeps its orders", async () => {
+    // DB 9dima: plat mn l-menu l-hindi mazal active
+    await admin.post("/api/menu").send({ name: "Butter Chicken", category: "Main Course", price: 400 }).expect(201);
+    const before = (await admin.get("/api/order")).body.data.length;
+
+    const result = await seedDatabase();
+    assert.equal(result.menuRetired, 1);
+    assert.equal(result.menuAdded, 0);
+
+    const { body: waiterMenu } = await waiter.get("/api/menu");
+    assert.ok(!waiterMenu.data.some((item) => item.name === "Butter Chicken"));
+    assert.ok(waiterMenu.data.some((item) => item.name === "Tanjia Marrakchia"));
+    // Admin mazal kaychoufo (y9der y3awd y-activih), w les commandes ma tms7och
+    const { body: adminMenu } = await admin.get("/api/menu");
+    assert.equal(adminMenu.data.find((item) => item.name === "Butter Chicken").isActive, false);
+    assert.equal((await admin.get("/api/order")).body.data.length, before);
+  });
+
   test("online payment is disabled without Razorpay keys", async () => {
     const { body } = await waiter.get("/api/payment/config");
     assert.equal(body.data.onlineEnabled, false);
     await waiter
       .post("/api/payment/create-order")
-      .send({ items: [{ name: "Samosa", quantity: 1 }] })
+      .send({ items: [{ name: "Harira", quantity: 1 }] })
       .expect(503);
   });
 

@@ -4,7 +4,7 @@ import { FaShoppingCart } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { addItems, MAX_QUANTITY } from "../../redux/slices/cartSlice";
 import { useMenu } from "../../hooks/queries";
-import { categoryRank, getCategoryStyle } from "../../constants";
+import { categoryRank, findDishImage, getCategoryStyle } from "../../constants";
 import { formatPrice } from "../../utils";
 
 const MenuContainer = () => {
@@ -78,15 +78,26 @@ const MenuContainer = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 px-4 md:px-10 py-4 w-[100%] lg:overflow-y-scroll scrollbar-hide lg:max-h-[calc(100vh-24rem)]">
         {selected?.items.map((item) => {
+          const image = findDishImage(item.name);
           return (
             <div
               key={item._id}
-              className="flex flex-col items-start justify-between gap-3 p-4 rounded-lg min-h-[120px] md:h-[150px] cursor-pointer hover:bg-[#2a2a2a] bg-[#1a1a1a]"
+              className="flex flex-col items-start justify-between gap-3 p-4 rounded-lg min-h-[120px] md:min-h-[150px] cursor-pointer hover:bg-[#2a2a2a] bg-[#1a1a1a]"
             >
-              <div className="flex items-start justify-between w-full">
-                <h1 className="text-[#f5f5f5] text-lg font-semibold">
-                  {item.name}
-                </h1>
+              <div className="flex items-start justify-between w-full gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  {image && (
+                    <img
+                      src={image}
+                      alt=""
+                      loading="lazy"
+                      className="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover shrink-0"
+                    />
+                  )}
+                  <h1 className="text-[#f5f5f5] text-lg font-semibold">
+                    {item.name}
+                  </h1>
+                </div>
                 <button onClick={() => handleAddToCart(item)} className="bg-[#2e4a40] text-[#02ca3a] p-2 rounded-lg"><FaShoppingCart size={20} /></button>
               </div>
               <div className="flex items-center justify-between w-full">
