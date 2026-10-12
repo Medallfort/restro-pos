@@ -101,7 +101,7 @@ describe("Restro POS API", () => {
       })
       .expect(201);
 
-    assert.deepEqual(res.body.data.bills, { total: 220, tax: 11.55, totalWithTax: 231.55 });
+    assert.deepEqual(res.body.data.bills, { total: 220, discount: 0, tax: 11.55, totalWithTax: 231.55 });
     assert.equal(res.body.data.items[0].pricePerQuantity, 110);
 
     const after = await waiter.get("/api/table");

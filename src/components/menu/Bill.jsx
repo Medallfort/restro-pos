@@ -10,7 +10,8 @@ import {
 } from "../../https/index";
 import { enqueueSnackbar } from "notistack";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ORDER_RELATED_KEYS, usePaymentConfig } from "../../hooks/queries";
+import { ORDER_RELATED_KEYS, useMe, usePaymentConfig } from "../../hooks/queries";
+import { redeemOptions } from "../../utils/loyalty";
 import { formatPrice } from "../../utils";
 import Invoice from "../invoice/Invoice";
 
@@ -35,10 +36,23 @@ const Bill = () => {
   const total = useSelector(getTotalPrice);
   const { data: paymentConfig } = usePaymentConfig();
 
+  const { data: me } = useMe(isClient);
+
+  // Points de fidélité: client kaykhtar ch7al ystkhdem (b 100 b 100), max = solde wla l-montant
+  const [redeemSteps, setRedeemSteps] = useState(0);
+  const { maxSteps, step, value } = redeemOptions({
+    points: isClient ? me?.loyaltyPoints ?? 0 : 0,
+    total,
+    loyalty: paymentConfig?.loyalty,
+  });
+  const steps = Math.min(redeemSteps, maxSteps);
+  const redeemPoints = steps * step;
+  const discount = steps * value;
+
   // Estimation l-affichage. Montant l-7a9i9i kay7sbo server (w kayban f facture)
   const taxRate = paymentConfig?.taxRate ?? 5.25;
-  const tax = (total * taxRate) / 100;
-  const totalPriceWithTax = total + tax;
+  const tax = ((total - discount) * taxRate) / 100;
+  const totalPriceWithTax = total - discount + tax;
   const onlineEnabled = Boolean(paymentConfig?.onlineEnabled);
 
   const [paymentMethod, setPaymentMethod] = useState();
@@ -63,6 +77,7 @@ const Bill = () => {
         ? { table: customerData.table.tableId }
         : { tableNo: customerData.table.tableNo })),
     paymentMethod,
+    ...(redeemPoints > 0 && { redeemPoints }),
     ...(paymentData && { paymentData }),
   });
 
@@ -76,6 +91,7 @@ const Bill = () => {
       dispatch(removeCustomer());
       dispatch(removeAllItems());
       setPaymentMethod(undefined);
+      setRedeemSteps(0);
       ORDER_RELATED_KEYS.forEach((queryKey) => queryClient.invalidateQueries({ queryKey }));
       enqueueSnackbar(
         isClient ? "Order sent! A waiter will confirm it shortly." : "Order Placed!",
@@ -94,7 +110,10 @@ const Bill = () => {
       return;
     }
 
-    const { data } = await createOrderRazorpay({ items: orderItems });
+    const { data } = await createOrderRazorpay({
+      items: orderItems,
+      ...(redeemPoints > 0 && { redeemPoints }),
+    });
     const rzp = new window.Razorpay({
       key: paymentConfig.keyId,
       amount: data.order.amount,
@@ -169,6 +188,40 @@ const Bill = () => {
         </p>
         <h1 className="text-[#f5f5f5] text-md font-bold">{formatPrice(total)}</h1>
       </div>
+      {maxSteps > 0 && (
+        <div className="flex items-center justify-between gap-3 px-5 mt-2">
+          <p className="text-xs text-[#ababab] font-medium">
+            Loyalty points <span className="text-[#f6b100]">({me.loyaltyPoints} pts)</span>
+          </p>
+          <div className="flex items-center gap-3 bg-[#1f1f1f] rounded-lg px-3 py-1">
+            <button
+              onClick={() => setRedeemSteps(steps - 1)}
+              disabled={steps === 0}
+              aria-label="Use fewer points"
+              className="text-yellow-500 text-xl disabled:opacity-30"
+            >
+              &minus;
+            </button>
+            <span className="text-[#f5f5f5] text-sm font-semibold min-w-[4.5rem] text-center">
+              {redeemPoints} pts
+            </span>
+            <button
+              onClick={() => setRedeemSteps(steps + 1)}
+              disabled={steps >= maxSteps}
+              aria-label="Use more points"
+              className="text-yellow-500 text-xl disabled:opacity-30"
+            >
+              &#43;
+            </button>
+          </div>
+        </div>
+      )}
+      {discount > 0 && (
+        <div className="flex items-center justify-between px-5 mt-2">
+          <p className="text-xs text-[#ababab] font-medium mt-2">Points discount</p>
+          <h1 className="text-[#02ca3a] text-md font-bold">−{formatPrice(discount)}</h1>
+        </div>
+      )}
       <div className="flex items-center justify-between px-5 mt-2">
         <p className="text-xs text-[#ababab] font-medium mt-2">Tax({taxRate}%)</p>
         <h1 className="text-[#f5f5f5] text-md font-bold">{formatPrice(tax)}</h1>

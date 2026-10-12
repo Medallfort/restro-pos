@@ -30,6 +30,8 @@ const orderSchema = new mongoose.Schema(
     // Les prix kay7sbhom server mn MenuItem, machi li jaw mn l-client
     bills: {
       total: { type: Number, required: true },
+      // Remise b points de fidélité (9bel TVA)
+      discount: { type: Number, default: 0 },
       tax: { type: Number, required: true },
       totalWithTax: { type: Number, required: true },
     },
@@ -52,6 +54,11 @@ const orderSchema = new mongoose.Schema(
       },
     },
     paymentMethod: { type: String, enum: PAYMENT_METHODS, required: true },
+    // Points li khdem bihom l-client f had l-commande, w li rb7 mli tsalat (Completed)
+    loyalty: {
+      pointsRedeemed: { type: Number, default: 0 },
+      pointsEarned: { type: Number, default: 0 },
+    },
     paymentData: {
       razorpay_order_id: String,
       razorpay_payment_id: String,

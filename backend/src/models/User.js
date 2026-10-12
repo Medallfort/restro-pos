@@ -12,12 +12,21 @@ const userSchema = new mongoose.Schema(
     // select: false -> l-hash ma kayrje3ch f les requetes ila ma tlebtihch b .select("+password")
     password: { type: String, required: true, select: false },
     role: { type: String, enum: ROLES, default: "Client" },
+    // Programme de fidélité (utils/loyalty.js)
+    loyaltyPoints: { type: Number, default: 0, min: 0 },
   },
   { timestamps: true }
 );
 
 userSchema.methods.toPublic = function toPublic() {
-  return { _id: this._id, name: this.name, email: this.email, phone: this.phone, role: this.role };
+  return {
+    _id: this._id,
+    name: this.name,
+    email: this.email,
+    phone: this.phone,
+    role: this.role,
+    loyaltyPoints: this.loyaltyPoints ?? 0,
+  };
 };
 
 export default mongoose.model("User", userSchema);

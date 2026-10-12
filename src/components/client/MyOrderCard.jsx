@@ -21,6 +21,19 @@ const MyOrderCard = ({ order }) => (
       </span>
       <span className="text-[#f5f5f5] font-semibold">{formatPrice(order.bills.totalWithTax)}</span>
     </div>
+    {(order.loyalty?.pointsRedeemed > 0 || order.loyalty?.pointsEarned > 0) && (
+      <div className="flex items-center justify-end gap-3 mt-2 text-xs font-semibold">
+        {order.loyalty.pointsRedeemed > 0 && (
+          <span className="text-[#ababab]">
+            −{order.loyalty.pointsRedeemed} pts used
+            {order.orderStatus === "Cancelled" && " (refunded)"}
+          </span>
+        )}
+        {order.loyalty.pointsEarned > 0 && (
+          <span className="text-[#f6b100]">+{order.loyalty.pointsEarned} pts</span>
+        )}
+      </div>
+    )}
   </div>
 );
 
