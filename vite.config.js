@@ -10,4 +10,9 @@ export default defineConfig({
       '/api': 'http://127.0.0.1:8000',
     },
   },
+  // Tests dyal frontend (npm test). Backend 3ndo tests dyalo (node --test)
+  test: {
+    environment: 'jsdom',
+    include: ['src/**/*.test.{js,jsx}'],
+  },
 })

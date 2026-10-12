@@ -1,0 +1,59 @@
+# Kaydouz m3a kol push w kol Pull Request: lint, tests, build, w build dyal images Docker.
+# Ila chi job tfaylat, l-PR katban b X 7mra w ma khassch tmergiha.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend (lint, tests, build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  backend:
+    name: Backend (API tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      # mongodb-memory-server kaytelecharger MongoDB (~100MB): cache bach ma y3awdch kol merra
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: mongodb-binaries-${{ hashFiles('backend/package-lock.json') }}
+      - run: npm ci
+        working-directory: backend
+      - run: npm test
+        working-directory: backend
+
+  docker:
+    name: Docker images build
+    runs-on: ubuntu-latest
+    needs: [frontend, backend]
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t restro-web .
+      - run: docker build -t restro-backend ./backend

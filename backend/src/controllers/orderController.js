@@ -4,6 +4,7 @@ import Table from "../models/Table.js";
 import AppError from "../utils/AppError.js";
 import { computeBill } from "../utils/pricing.js";
 import { toMinorUnits } from "../utils/money.js";
+import { notifyOrders } from "../realtime/events.js";
 
 // Kat7jez paiement b tari9a atomique (paid -> used): ila jouj requetes jaw f nefs l-we9t
 // b nefs paiement, wa7da bo7dha li ghadi tnje7 (protection men replay).
@@ -89,6 +90,7 @@ export async function createOrder(req, res) {
   }
 
   await order.populate("table", "tableNo");
+  notifyOrders(order.createdBy);
   res.status(201).json({ success: true, message: "Order created!", data: order });
 }
 
@@ -128,5 +130,6 @@ export async function updateOrderStatus(req, res) {
   // Commande salat wla tlghat: table katwelli khawya
   if (next === "Completed" || next === "Cancelled") await releaseTable(order);
 
+  notifyOrders(order.createdBy);
   res.json({ success: true, message: "Order updated", data: order });
 }

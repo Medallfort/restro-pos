@@ -13,19 +13,22 @@ import {
 // Queries partagees: nefs queryKey = cache wa7ed bin les pages
 const select = (res) => res.data.data;
 
-// Refresh kol 15s: bach serveur ychouf les commandes dyal les clients (Pending) bla ma y-actualiser
+// Les commandes kaytbeddlo f l7in b live updates (useLiveUpdates). Refresh kol 60s ghir backup
+// ila t9ta3 l-connexion SSE.
+const BACKUP_REFRESH_MS = 60000;
+
 export const useOrders = () =>
   useQuery({
     queryKey: ["orders"],
     queryFn: getOrders,
     select,
     placeholderData: keepPreviousData,
-    refetchInterval: 15000,
+    refetchInterval: BACKUP_REFRESH_MS,
   });
 
 // Client: ghir les commandes dyalo, bach ychouf imta t-confirmat w imta wajda
 export const useMyOrders = () =>
-  useQuery({ queryKey: ["my-orders"], queryFn: getMyOrders, select, refetchInterval: 15000 });
+  useQuery({ queryKey: ["my-orders"], queryFn: getMyOrders, select, refetchInterval: BACKUP_REFRESH_MS });
 
 export const useRevenueReport = (period) =>
   useQuery({

@@ -1,5 +1,6 @@
 import MenuItem from "../models/MenuItem.js";
 import AppError from "../utils/AppError.js";
+import { notifyMenu } from "../realtime/events.js";
 
 export async function listMenu(req, res) {
   // Admin kaychouf 7ta les plats li m3attlin (bach y9der y3awd y-activihom)
@@ -10,6 +11,7 @@ export async function listMenu(req, res) {
 
 export async function createMenuItem(req, res) {
   const item = await MenuItem.create(req.body);
+  notifyMenu();
   res.status(201).json({ success: true, message: "Dish added!", data: item });
 }
 
@@ -19,5 +21,6 @@ export async function updateMenuItem(req, res) {
 
   Object.assign(item, req.body);
   await item.save();
+  notifyMenu();
   res.json({ success: true, message: "Dish updated", data: item });
 }

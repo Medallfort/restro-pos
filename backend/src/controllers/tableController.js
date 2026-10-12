@@ -1,9 +1,11 @@
 import Table from "../models/Table.js";
 import Order, { BILLABLE_STATUSES } from "../models/Order.js";
 import AppError from "../utils/AppError.js";
+import { notifyTables } from "../realtime/events.js";
 
 export async function createTable(req, res) {
   const table = await Table.create(req.body);
+  notifyTables();
   res.status(201).json({ success: true, message: "Table added!", data: table });
 }
 
@@ -28,6 +30,7 @@ export async function updateTable(req, res) {
   table.status = status;
 
   await table.save();
+  notifyTables();
   res.json({ success: true, message: "Table updated", data: table });
 }
 
