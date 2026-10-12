@@ -4,5 +4,7 @@ import { seedDatabase } from "../src/data/seed.js";
 
 await connectDB(env.MONGODB_URI);
 const result = await seedDatabase();
-console.log(`Seed done: ${result.menuAdded} dishes, ${result.tablesAdded} tables added`);
+console.log(
+  `Seed done: ${result.menuAdded} dishes, ${result.tablesAdded} tables added, ${result.menuRetired} old dishes hidden`
+);
 await disconnectDB();

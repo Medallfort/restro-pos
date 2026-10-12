@@ -1,42 +1,49 @@
-import butterChicken from '../assets/images/butter-chicken-4.jpg';
-import palakPaneer from '../assets/images/Saag-Paneer-1.jpg';
-import biryani from '../assets/images/hyderabadibiryani.jpg';
-import masalaDosa from '../assets/images/masala-dosa.jpg';
-import choleBhature from '../assets/images/chole-bhature.jpg';
-import rajmaChawal from '../assets/images/rajma-chawal-1.jpg';
-import paneerTikka from '../assets/images/paneer-tika.webp';
-import gulabJamun from '../assets/images/gulab-jamun.webp';
-import pooriSabji from '../assets/images/poori-sabji.webp';
-import roganJosh from '../assets/images/rogan-josh.jpg';
 import logo from '../assets/images/logo.png';
 
 // Data (plats, prix, tables, commandes) kayji mn l-API. Hna ghir l-presentation.
 
+// Tsawer dyal les plats: kol fichier f assets/images/menu kaykhdem b smiya dyalo
+// (ex: "tajine-poulet-citron.jpg"). Sources w licenses f assets/images/menu/CREDITS.md
+const menuPhotos = import.meta.glob('../assets/images/menu/*.jpg', { eager: true, import: 'default' });
+const photo = (slug) => menuPhotos[`../assets/images/menu/${slug}.jpg`];
+
 const dishImages = {
-  "butter chicken": butterChicken,
-  "palak paneer": palakPaneer,
-  "chicken biryani": biryani,
-  "hyderabadi biryani": biryani,
-  "masala dosa": masalaDosa,
-  "chole bhature": choleBhature,
-  "rajma chawal": rajmaChawal,
-  "paneer tikka": paneerTikka,
-  "gulab jamun": gulabJamun,
-  "poori sabji": pooriSabji,
-  "rogan josh": roganJosh,
+  "salade marocaine": photo("salade-marocaine"),
+  "zaalouk": photo("zaalouk"),
+  "harira": photo("harira"),
+  "bissara": photo("bissara"),
+  "tajine poulet citron": photo("tajine-poulet-citron"),
+  "tajine agneau pruneaux": photo("tajine-pruneaux"),
+  "couscous sept légumes": photo("couscous"),
+  "seffa medfouna": photo("seffa"),
+  "pastilla poulet": photo("pastilla-poulet"),
+  "rfissa": photo("rfissa"),
+  "tanjia marrakchia": photo("tanjia"),
+  "méchoui": photo("mechoui"),
+  "brochettes kefta": photo("brochettes-kefta"),
+  "chebakia": photo("chebakia"),
+  "cornes de gazelle": photo("cornes-gazelle"),
+  "baghrir au miel": photo("baghrir"),
+  "msemen au miel": photo("msemen"),
+  "thé à la menthe": photo("the-menthe"),
+  "jus d'orange": photo("jus-orange"),
 };
 
-export const getDishImage = (name) => dishImages[name?.toLowerCase()] ?? logo;
+// Tswira dyal l-plat, wla null ila ma3ndoch
+export const findDishImage = (name) => dishImages[name?.toLowerCase()] ?? null;
+
+export const getDishImage = (name) => findDishImage(name) ?? logo;
 
 const categoryStyles = {
-  "Starters": { bgColor: "#b73e3e", icon: "🍲" },
-  "Main Course": { bgColor: "#5b45b0", icon: "🍛" },
-  "Beverages": { bgColor: "#7f167f", icon: "🍹" },
-  "Soups": { bgColor: "#735f32", icon: "🍜" },
-  "Desserts": { bgColor: "#1d2569", icon: "🍰" },
-  "Pizzas": { bgColor: "#285430", icon: "🍕" },
-  "Alcoholic Drinks": { bgColor: "#b73e3e", icon: "🍺" },
-  "Salads": { bgColor: "#5b45b0", icon: "🥗" },
+  "Starters": { bgColor: "#285430", icon: "🥗" },
+  "Soups": { bgColor: "#735f32", icon: "🍲" },
+  "Tagines": { bgColor: "#b73e3e", icon: "🥘" },
+  "Couscous": { bgColor: "#5b45b0", icon: "🍛" },
+  "Specialties": { bgColor: "#7f167f", icon: "🥧" },
+  "Grills": { bgColor: "#be3e3f", icon: "🍢" },
+  "Pizzas": { bgColor: "#025cca", icon: "🍕" },
+  "Desserts": { bgColor: "#1d2569", icon: "🍯" },
+  "Beverages": { bgColor: "#285430", icon: "🍵" },
 };
 
 // Tartib dyal les categories f l-menu (jdad kayjiw f l-lekher)
