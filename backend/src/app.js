@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { pinoHttp } from "pino-http";
 import env from "./config/env.js";
+import { httpLoggerOptions } from "./config/logger.js";
 import routes from "./routes/index.js";
 import { apiLimiter } from "./middleware/rateLimiters.js";
 import { errorHandler, notFound } from "./middleware/errorHandler.js";
@@ -20,7 +21,7 @@ export function createApp() {
   if (env.CORS_ORIGINS.length > 0) {
     app.use(cors({ origin: env.CORS_ORIGINS, credentials: true }));
   }
-  if (env.NODE_ENV !== "test") app.use(pinoHttp({ autoLogging: { ignore: (req) => req.url === "/health" } }));
+  if (env.NODE_ENV !== "test") app.use(pinoHttp(httpLoggerOptions));
 
   app.use(express.json({ limit: "100kb" }));
   app.use(cookieParser());
