@@ -19,7 +19,9 @@ const Menu = () => {
   return (
     <section className="bg-[#1f1f1f] h-[calc(100vh-5rem)] overflow-y-auto lg:overflow-hidden pb-24 lg:pb-0 flex flex-col lg:flex-row gap-3">
       {/* Left Div */}
-      <div className="lg:flex-[3] min-w-0">
+      {/* Desktop: les plats kayscrolliw f l-espace li b9a ta7t les catégories (machi hauteur fixe).
+          F écran 9sir bzzaf, l-colonne kamla katscrolli bach les plats ybano dima */}
+      <div className="lg:flex-[3] min-w-0 lg:h-full lg:flex lg:flex-col lg:pb-16 lg:overflow-y-auto scrollbar-hide">
         <div className="flex items-center justify-between gap-3 px-4 md:px-10 py-4">
           <div className="flex items-center gap-4">
             <BackButton />

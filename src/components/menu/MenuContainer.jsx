@@ -49,12 +49,12 @@ const MenuContainer = () => {
 
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 px-4 md:px-10 py-4 w-[100%]">
+      <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 px-4 md:px-10 py-4 w-[100%] shrink-0">
         {menus.map((menu) => {
           return (
             <div
               key={menu.name}
-              className="flex flex-col items-start justify-between p-3 md:p-4 rounded-lg h-[80px] md:h-[100px] cursor-pointer"
+              className="flex flex-col items-start justify-between p-3 md:p-4 rounded-lg h-[80px] md:h-[90px] cursor-pointer"
               style={{ backgroundColor: menu.bgColor }}
               onClick={() => setSelectedName(menu.name)}
             >
@@ -74,9 +74,9 @@ const MenuContainer = () => {
         })}
       </div>
 
-      <hr className="border-[#2a2a2a] border-t-2 mt-4" />
+      <hr className="border-[#2a2a2a] border-t-2 mt-4 shrink-0" />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 px-4 md:px-10 py-4 w-[100%] lg:overflow-y-scroll scrollbar-hide lg:max-h-[calc(100vh-24rem)]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4 px-4 md:px-10 py-4 w-[100%] lg:overflow-y-auto scrollbar-hide lg:flex-1 lg:min-h-[13rem] content-start">
         {selected?.items.map((item) => {
           const image = findDishImage(item.name);
           return (
