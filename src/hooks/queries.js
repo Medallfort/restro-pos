@@ -8,6 +8,7 @@ import {
   getStats,
   getTableHistory,
   getTables,
+  getUserData,
 } from "../https";
 
 // Queries partagees: nefs queryKey = cache wa7ed bin les pages
@@ -55,6 +56,10 @@ export const useMenu =() => useQuery({ queryKey: ["menu"], queryFn: getMenu, sel
 export const useStats = () =>
   useQuery({ queryKey: ["stats"], queryFn: getStats, select, refetchInterval: 60000 });
 
+// Compte dyal l-user (b points de fidélité). Kaytbeddel mli commande katsala wla tlghat
+export const useMe = (enabled = true) =>
+  useQuery({ queryKey: ["me"], queryFn: getUserData, select, enabled });
+
 export const usePaymentConfig = () =>
   useQuery({ queryKey: ["payment-config"], queryFn: getPaymentConfig, select, staleTime: Infinity });
 
@@ -66,4 +71,5 @@ export const ORDER_RELATED_KEYS = [
   ["stats"],
   ["table-history"],
   ["revenue"],
+  ["me"],
 ];

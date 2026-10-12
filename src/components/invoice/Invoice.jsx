@@ -107,6 +107,12 @@ const Invoice = ({ orderInfo, setShowInvoice }) => {
             <p>
               <strong>Subtotal:</strong> {formatPrice(orderInfo.bills.total)}
             </p>
+            {orderInfo.bills.discount > 0 && (
+              <p>
+                <strong>Loyalty discount ({orderInfo.loyalty?.pointsRedeemed} pts):</strong> −
+                {formatPrice(orderInfo.bills.discount)}
+              </p>
+            )}
             <p>
               <strong>Tax:</strong> {formatPrice(orderInfo.bills.tax)}
             </p>

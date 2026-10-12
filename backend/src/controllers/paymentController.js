@@ -4,6 +4,7 @@ import Payment from "../models/Payment.js";
 import AppError from "../utils/AppError.js";
 import { computeBill } from "../utils/pricing.js";
 import { toMinorUnits } from "../utils/money.js";
+import { discountFor, LOYALTY } from "../utils/loyalty.js";
 
 function ensureEnabled() {
   if (!env.RAZORPAY_ENABLED) throw new AppError(503, "Online payment is not configured");
@@ -17,6 +18,7 @@ export function getPaymentConfig(req, res) {
       onlineEnabled: env.RAZORPAY_ENABLED,
       keyId: env.RAZORPAY_ENABLED ? env.RAZORPAY_KEY_ID : null,
       taxRate: env.TAX_RATE,
+      loyalty: LOYALTY,
     },
   });
 }
@@ -25,7 +27,10 @@ export async function createPaymentOrder(req, res) {
   ensureEnabled();
 
   // L-montant kay7sbo server mn les plats, machi l-montant li sifto l-client
-  const { bills } = await computeBill(req.body.items);
+  // Nefs remise li ghadi tdar f createOrder (sinon montant ma ytsawach)
+  const { bills } = await computeBill(req.body.items, {
+    discount: discountFor(req.body.redeemPoints ?? 0),
+  });
   const amount = toMinorUnits(bills.totalWithTax);
 
   const credentials = Buffer.from(`${env.RAZORPAY_KEY_ID}:${env.RAZORPAY_KEY_SECRET}`).toString("base64");

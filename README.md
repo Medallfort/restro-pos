@@ -92,6 +92,15 @@ the cart are only a preview.
 Set `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` in `backend/.env`. Without both, the Online button
 is disabled. Note Razorpay charges in INR while the UI displays DH.
 
+## Loyalty points
+
+Clients (accounts with the Client role) collect points: **100 DH paid = 100 points**, and
+**100 points = 10 DH off** a later order. Points are added when the order is *Completed*, on the
+amount actually paid (after discount, with tax). In the cart a client chooses how many points to
+use, in steps of 100; the discount comes off before tax and can never exceed the order. If an order
+that used points is cancelled, the points go back to the client. Orders a waiter enters for walk-in
+customers neither earn nor use points. The rates live in `backend/src/utils/loyalty.js`.
+
 ## Live updates
 
 Orders, tables and the menu refresh on every open screen as soon as something changes, without

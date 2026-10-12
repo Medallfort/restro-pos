@@ -1,10 +1,12 @@
 import Order, { STATUS_TRANSITIONS } from "../models/Order.js";
 import Payment from "../models/Payment.js";
 import Table from "../models/Table.js";
+import User from "../models/User.js";
 import AppError from "../utils/AppError.js";
 import { computeBill } from "../utils/pricing.js";
 import { toMinorUnits } from "../utils/money.js";
 import { notifyOrders } from "../realtime/events.js";
+import { addPoints, discountFor, pointsEarnedFor, spendPoints } from "../utils/loyalty.js";
 
 // Kat7jez paiement b tari9a atomique (paid -> used): ila jouj requetes jaw f nefs l-we9t
 // b nefs paiement, wa7da bo7dha li ghadi tnje7 (protection men replay).
@@ -48,34 +50,51 @@ async function releaseTable(order) {
 export async function createOrder(req, res) {
   const { items, orderType, paymentMethod, paymentData } = req.body;
   const isClient = req.user.role === "Client";
+  const redeemPoints = req.body.redeemPoints ?? 0;
+  // Points dyal compte client: serveur ma y9derch ystkhdemhom f commande dyal walk-in
+  if (redeemPoints > 0 && !isClient) {
+    throw new AppError(400, "Only customers can use loyalty points");
+  }
 
   const table = orderType === "Dine In" ? await findTable(req.body) : null;
-  const { items: pricedItems, bills } = await computeBill(items);
-
-  const payment =
-    paymentMethod === "Online"
-      ? await claimVerifiedPayment(paymentData, bills.totalWithTax, req.user._id)
-      : null;
+  const { items: pricedItems, bills } = await computeBill(items, {
+    discount: discountFor(redeemPoints),
+  });
 
   // Client: smiya w tel mn compte dyalo. Commande dyalo katsenna serveur y-confirmiha
   const customerDetails = isClient
     ? { name: req.user.name, phone: req.user.phone, guests: req.body.customerDetails.guests }
     : req.body.customerDetails;
 
-  const order = await Order.create({
-    customerDetails,
-    orderType,
-    orderStatus: isClient ? "Pending" : "In Progress",
-    items: pricedItems,
-    bills,
-    table: table?._id ?? null,
-    paymentMethod,
-    paymentData: payment
-      ? { razorpay_order_id: payment.razorpayOrderId, razorpay_payment_id: payment.razorpayPaymentId }
-      : undefined,
-    createdBy: req.user._id,
-    servedBy: isClient ? null : req.user._id,
-  });
+  // Points kayt9esso 9bel l-commande, w kayrj3o ila l-paiement wla l-commande tfaylat
+  if (redeemPoints > 0) await spendPoints(req.user._id, redeemPoints);
+  let order;
+  let payment;
+  try {
+    payment =
+      paymentMethod === "Online"
+        ? await claimVerifiedPayment(paymentData, bills.totalWithTax, req.user._id)
+        : null;
+
+    order = await Order.create({
+      customerDetails,
+      orderType,
+      orderStatus: isClient ? "Pending" : "In Progress",
+      items: pricedItems,
+      bills,
+      table: table?._id ?? null,
+      paymentMethod,
+      paymentData: payment
+        ? { razorpay_order_id: payment.razorpayOrderId, razorpay_payment_id: payment.razorpayPaymentId }
+        : undefined,
+      loyalty: { pointsRedeemed: redeemPoints },
+      createdBy: req.user._id,
+      servedBy: isClient ? null : req.user._id,
+    });
+  } catch (error) {
+    await addPoints(req.user._id, redeemPoints);
+    throw error;
+  }
 
   if (payment) {
     payment.order = order._id;
@@ -113,6 +132,24 @@ export async function listMyOrders(req, res) {
   res.json({ success: true, data: orders });
 }
 
+// Fidélité: commande salat -> client kayrb7 points 3la li khlles; tlghat -> kayrj3o lih
+// les points li khdem bihom. Ghir commandes dyal comptes Client (machi walk-in dyal serveur)
+async function applyLoyalty(order) {
+  if (order.orderStatus === "Cancelled") {
+    await addPoints(order.createdBy, order.loyalty?.pointsRedeemed ?? 0);
+    return;
+  }
+  if (order.orderStatus !== "Completed") return;
+
+  const owner = await User.findById(order.createdBy);
+  if (owner?.role !== "Client") return;
+
+  const earned = pointsEarnedFor(order.bills.totalWithTax);
+  order.loyalty.pointsEarned = earned;
+  await order.save();
+  await addPoints(owner._id, earned);
+}
+
 export async function updateOrderStatus(req, res) {
   const order = await Order.findById(req.params.id);
   if (!order) throw new AppError(404, "Order not found");
@@ -122,14 +159,24 @@ export async function updateOrderStatus(req, res) {
     throw new AppError(409, `Cannot change an order from ${order.orderStatus} to ${next}`);
   }
 
-  order.orderStatus = next;
+  const update = { orderStatus: next };
   // Serveur li confirma commande dyal client howa li kaytsjjel "servedBy"
-  if (!order.servedBy && next !== "Cancelled") order.servedBy = req.user._id;
-  await order.save();
+  if (!order.servedBy && next !== "Cancelled") update.servedBy = req.user._id;
+
+  // Atomique: ghir ila statut mazal howa li 9rina. Jouj serveurs kaybeddlo nefs l-commande
+  // f nefs l-we9t -> wa7ed bo7do li kaynje7 (sinon points ytzado jouj merrat)
+  const updated = await Order.findOneAndUpdate(
+    { _id: order._id, orderStatus: order.orderStatus },
+    { $set: update },
+    { returnDocument: "after" }
+  );
+  if (!updated) throw new AppError(409, "This order was just updated, refresh and try again");
+
+  await applyLoyalty(updated);
 
   // Commande salat wla tlghat: table katwelli khawya
-  if (next === "Completed" || next === "Cancelled") await releaseTable(order);
+  if (next === "Completed" || next === "Cancelled") await releaseTable(updated);
 
-  notifyOrders(order.createdBy);
-  res.json({ success: true, message: "Order updated", data: order });
+  notifyOrders(updated.createdBy);
+  res.json({ success: true, message: "Order updated", data: updated });
 }

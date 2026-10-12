@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ROLES } from "../models/User.js";
 import { TABLE_STATUSES } from "../models/Table.js";
 import { ORDER_STATUSES, ORDER_TYPES, PAYMENT_METHODS } from "../models/Order.js";
+import { LOYALTY } from "../utils/loyalty.js";
 
 const objectId = z.string().refine((value) => mongoose.isValidObjectId(value), "Invalid id");
 
@@ -40,6 +41,13 @@ const orderItem = z.object({
   quantity: z.coerce.number().int().min(1).max(20),
 });
 
+const redeemPoints = z.coerce
+  .number()
+  .int()
+  .min(0)
+  .max(100000)
+  .refine((points) => points % LOYALTY.redeemStep === 0, `Points are used in steps of ${LOYALTY.redeemStep}`);
+
 export const createOrderSchema = z
   .object({
     customerDetails: z.object({
@@ -54,6 +62,8 @@ export const createOrderSchema = z
     table: objectId.optional(),
     tableNo: z.coerce.number().int().min(1).max(999).optional(),
     paymentMethod: z.enum(PAYMENT_METHODS),
+    // Points de fidélité li bgha ystkhdem l-client (b 100 b 100)
+    redeemPoints: redeemPoints.optional(),
     paymentData: z
       .object({
         razorpay_order_id: z.string().max(100),
@@ -73,7 +83,10 @@ export const revenueQuerySchema = z.object({
 
 export const updateOrderStatusSchema = z.object({ orderStatus: z.enum(ORDER_STATUSES) });
 
-export const createPaymentSchema = z.object({ items: z.array(orderItem).min(1).max(50) });
+export const createPaymentSchema = z.object({
+  items: z.array(orderItem).min(1).max(50),
+  redeemPoints: redeemPoints.optional(),
+});
 
 export const verifyPaymentSchema = z.object({
   razorpay_order_id: z.string().min(1).max(100),

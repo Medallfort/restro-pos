@@ -4,6 +4,7 @@ import BottomNav from "../components/shared/BottomNav";
 import Greetings from "../components/home/Greetings";
 import NewOrderForm from "../components/shared/NewOrderForm";
 import MyOrderCard from "../components/client/MyOrderCard";
+import LoyaltyCard from "../components/client/LoyaltyCard";
 import { useMyOrders } from "../hooks/queries";
 
 // Page d'accueil dyal client: commande jdida (sur place wla à emporter) + akhir commandes dyalo
@@ -26,6 +27,7 @@ const ClientHome = () => {
           </p>
           <NewOrderForm />
         </div>
+        <LoyaltyCard />
       </div>
 
       <div className="flex-[2] px-4 md:px-6 mt-2 lg:mt-6">
