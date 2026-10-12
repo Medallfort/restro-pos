@@ -10,6 +10,7 @@ import * as payments from "../controllers/paymentController.js";
 import * as menu from "../controllers/menuController.js";
 import { getRevenueReport, getStats } from "../controllers/statsController.js";
 import { STAFF_ROLES } from "../models/User.js";
+import { subscribe } from "../realtime/events.js";
 
 const router = Router();
 const adminOnly = requireRole("Admin");
@@ -25,6 +26,9 @@ router.post("/user/logout", users.logout);
 router.use(requireAuth);
 
 router.get("/user", users.getMe);
+
+// Live updates (Server-Sent Events)
+router.get("/events", subscribe);
 router.get("/user/all", adminOnly, users.listUsers);
 router.put(
   "/user/:id/role",

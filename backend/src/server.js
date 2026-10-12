@@ -1,6 +1,7 @@
 import env from "./config/env.js";
 import { connectDB, disconnectDB } from "./config/db.js";
 import { createApp } from "./app.js";
+import { closeAll } from "./realtime/events.js";
 
 await connectDB(env.MONGODB_URI);
 const server = createApp().listen(env.PORT, env.HOST, () => {
@@ -14,6 +15,8 @@ async function shutdown(signal) {
     await disconnectDB();
     process.exit(0);
   });
+  // Connexions SSE ma kaysaliwch bo7dhom
+  closeAll();
   setTimeout(() => process.exit(1), 10000).unref();
 }
 process.on("SIGINT", shutdown);

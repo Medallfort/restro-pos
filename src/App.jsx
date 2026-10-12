@@ -10,6 +10,7 @@ import { STAFF_ROLES } from "./constants";
 import Header from "./components/shared/Header";
 import { useSelector } from "react-redux";
 import useLoadData from "./hooks/useLoadData";
+import useLiveUpdates from "./hooks/useLiveUpdates";
 import FullScreenLoader from "./components/shared/FullScreenLoader"
 
 function Layout() {
@@ -19,6 +20,7 @@ function Layout() {
   const { isAuth, role } = useSelector(state => state.user);
   // Client 3ndo pages dyalo: commande jdida w "Mes commandes"
   const isClient = role === "Client";
+  useLiveUpdates(isAuth);
 
   if(isLoading) return <FullScreenLoader />
 

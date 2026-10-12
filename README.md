@@ -92,11 +92,26 @@ the cart are only a preview.
 Set `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` in `backend/.env`. Without both, the Online button
 is disabled. Note Razorpay charges in INR while the UI displays DH.
 
+## Live updates
+
+Orders, tables and the menu refresh on every open screen as soon as something changes, without
+reloading. The browser keeps one connection to `/api/events` (Server-Sent Events); the server only
+says *what* changed (`orders`, `tables`, `menu`) and the page refetches that data from the API.
+Staff receive every change; a client only hears about their own orders. If the connection drops,
+the browser reconnects by itself and the pages still refresh every 60 s as a backup.
+
+## Development workflow
+
+`main` is what runs on the server. Work on a branch, open a Pull Request to `main`; GitHub Actions
+(`.github/workflows/ci.yml`) runs lint, frontend tests, API tests, the build and both Docker builds.
+Merge only when it is green, then on the server: `git pull && docker compose up -d --build`.
+
 ## Scripts
 
 | Where | Command | What |
 | --- | --- | --- |
 | root | `npm run dev` / `build` / `lint` | Frontend |
+| root | `npm test` | Frontend tests (Vitest) |
 | backend | `npm run dev:mem` | API + in-memory MongoDB |
 | backend | `npm run dev` / `start` | API with `backend/.env` |
 | backend | `npm run seed` | Seed menu & tables |
@@ -110,6 +125,7 @@ All under `/api`; everything except register/login/logout needs a session.
 | --- | --- | --- |
 | POST | `/user/register`, `/user/login`, `/user/logout` | rate-limited |
 | GET | `/user` | current user |
+| GET | `/events` | live updates (Server-Sent Events) |
 | GET / PUT | `/user/all`, `/user/:id/role` | Admin |
 | GET / POST / PUT | `/table`, `/table/:id` | POST is Admin |
 | GET / POST / PUT | `/menu`, `/menu/:id` | POST/PUT Admin |
