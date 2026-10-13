@@ -71,7 +71,7 @@ describe("Loyalty points", () => {
 
   test("a new client starts with 0 points; the config is public", async () => {
     assert.equal(await points(client), 0);
-    const { body } = await client.get("/api/payment/config");
+    const { body } = await client.get("/api/config");
     assert.deepEqual(body.data.loyalty, { pointsPerDh: 1, redeemStep: 100, redeemValue: 10 });
   });
 

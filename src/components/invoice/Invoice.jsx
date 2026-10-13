@@ -125,25 +125,9 @@ const Invoice = ({ orderInfo, setShowInvoice }) => {
           {/* Payment Details */}
 
           <div className="mb-2 mt-2 text-xs">
-            {orderInfo.paymentMethod === "Cash" ? (
-              <p>
-                <strong>Payment Method:</strong> {orderInfo.paymentMethod}
-              </p>
-            ) : (
-              <>
-                <p>
-                  <strong>Payment Method:</strong> {orderInfo.paymentMethod}
-                </p>
-                <p>
-                  <strong>Razorpay Order ID:</strong>{" "}
-                  {orderInfo.paymentData?.razorpay_order_id}
-                </p>
-                <p>
-                  <strong>Razorpay Payment ID:</strong>{" "}
-                  {orderInfo.paymentData?.razorpay_payment_id}
-                </p>
-              </>
-            )}
+            <p>
+              <strong>Payment Method:</strong> {orderInfo.paymentMethod}
+            </p>
           </div>
         </div>
 

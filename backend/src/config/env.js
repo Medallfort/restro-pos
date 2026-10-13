@@ -23,8 +23,6 @@ const schema = z.object({
     .default("")
     .transform((value) => value.split(",").map((origin) => origin.trim()).filter(Boolean)),
   TAX_RATE: z.coerce.number().min(0).max(100).default(5.25),
-  RAZORPAY_KEY_ID: z.preprocess(blankToUndefined, z.string().optional()),
-  RAZORPAY_KEY_SECRET: z.preprocess(blankToUndefined, z.string().optional()),
 });
 
 const parsed = schema.safeParse(process.env);
@@ -40,6 +38,5 @@ if (!parsed.success) {
 
 const env = parsed.data;
 env.COOKIE_SECURE ??= env.NODE_ENV === "production";
-env.RAZORPAY_ENABLED = Boolean(env.RAZORPAY_KEY_ID && env.RAZORPAY_KEY_SECRET);
 
 export default env;

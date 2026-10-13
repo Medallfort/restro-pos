@@ -61,15 +61,9 @@ export const createOrderSchema = z
     // Table b id (page Tables) wla b numéro (serveur/client kaykteb numéro)
     table: objectId.optional(),
     tableNo: z.coerce.number().int().min(1).max(999).optional(),
-    paymentMethod: z.enum(PAYMENT_METHODS),
+    paymentMethod: z.enum(PAYMENT_METHODS).default("Cash"),
     // Points de fidélité li bgha ystkhdem l-client (b 100 b 100)
     redeemPoints: redeemPoints.optional(),
-    paymentData: z
-      .object({
-        razorpay_order_id: z.string().max(100),
-        razorpay_payment_id: z.string().max(100),
-      })
-      .optional(),
     // "bills" w "orderStatus" li jaw mn l-client kayt-ignoraw: server howa li kay7sebhom
   })
   .refine((order) => order.orderType === "Takeaway" || order.table || order.tableNo, {
@@ -82,17 +76,6 @@ export const revenueQuerySchema = z.object({
 });
 
 export const updateOrderStatusSchema = z.object({ orderStatus: z.enum(ORDER_STATUSES) });
-
-export const createPaymentSchema = z.object({
-  items: z.array(orderItem).min(1).max(50),
-  redeemPoints: redeemPoints.optional(),
-});
-
-export const verifyPaymentSchema = z.object({
-  razorpay_order_id: z.string().min(1).max(100),
-  razorpay_payment_id: z.string().min(1).max(100),
-  razorpay_signature: z.string().min(1).max(256),
-});
 
 const dishName = z.string().trim().min(2).max(100);
 const category = z.string().trim().min(2).max(50);

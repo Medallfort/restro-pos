@@ -343,13 +343,28 @@ describe("Restro POS API", () => {
     assert.equal((await admin.get("/api/order")).body.data.length, before);
   });
 
-  test("online payment is disabled without Razorpay keys", async () => {
-    const { body } = await waiter.get("/api/payment/config");
-    assert.equal(body.data.onlineEnabled, false);
+  test("only cash payments: online payment is gone", async () => {
     await waiter
-      .post("/api/payment/create-order")
-      .send({ items: [{ name: "Harira", quantity: 1 }] })
-      .expect(503);
+      .post("/api/order")
+      .send({
+        customerDetails: { name: "Card", guests: 1 },
+        orderType: "Takeaway",
+        items: [{ name: "Harira", quantity: 1 }],
+        paymentMethod: "Online",
+      })
+      .expect(400);
+    await waiter.post("/api/payment/create-order").send({ items: [] }).expect(404);
+
+    // Bla paymentMethod: Cash par défaut
+    const { body } = await waiter
+      .post("/api/order")
+      .send({
+        customerDetails: { name: "Cash", guests: 1 },
+        orderType: "Takeaway",
+        items: [{ name: "Harira", quantity: 1 }],
+      })
+      .expect(201);
+    assert.equal(body.data.paymentMethod, "Cash");
   });
 
   test("too many failed logins lock that account only, not the whole IP", async () => {

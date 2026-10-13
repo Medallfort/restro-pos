@@ -3,7 +3,7 @@ import {
   getMenu,
   getMyOrders,
   getOrders,
-  getPaymentConfig,
+  getConfig,
   getRevenueReport,
   getStats,
   getTableHistory,
@@ -60,8 +60,8 @@ export const useStats = () =>
 export const useMe = (enabled = true) =>
   useQuery({ queryKey: ["me"], queryFn: getUserData, select, enabled });
 
-export const usePaymentConfig = () =>
-  useQuery({ queryKey: ["payment-config"], queryFn: getPaymentConfig, select, staleTime: Infinity });
+export const useAppConfig = () =>
+  useQuery({ queryKey: ["config"], queryFn: getConfig, select, staleTime: Infinity });
 
 // Ba3d ay commande/changement de statut, had les donnees kollhom tbeddlo
 export const ORDER_RELATED_KEYS = [

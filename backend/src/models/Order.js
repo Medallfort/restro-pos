@@ -2,7 +2,8 @@ import mongoose from "mongoose";
 
 // Pending: commande dyal client, katsenna serveur y-confirmiha (y-verifi table)
 export const ORDER_STATUSES = ["Pending", "In Progress", "Ready", "Completed", "Cancelled"];
-export const PAYMENT_METHODS = ["Cash", "Online"];
+// Ghir Cash. "Online" (Razorpay, 9dim) kayb9a f l-model bach les commandes l9dam yb9aw valides
+export const PAYMENT_METHODS = ["Cash"];
 export const ORDER_TYPES = ["Dine In", "Takeaway"];
 
 // Les commandes li kat7sb f chiffre d'affaires (Pending ma t-confirmatch, Cancelled tlghat)
@@ -53,15 +54,11 @@ const orderSchema = new mongoose.Schema(
         return this.orderType === "Dine In";
       },
     },
-    paymentMethod: { type: String, enum: PAYMENT_METHODS, required: true },
+    paymentMethod: { type: String, enum: [...PAYMENT_METHODS, "Online"], default: "Cash" },
     // Points li khdem bihom l-client f had l-commande, w li rb7 mli tsalat (Completed)
     loyalty: {
       pointsRedeemed: { type: Number, default: 0 },
       pointsEarned: { type: Number, default: 0 },
-    },
-    paymentData: {
-      razorpay_order_id: String,
-      razorpay_payment_id: String,
     },
     // Audit trail: chkoun creea l-commande (serveur wla client mn l-app)
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },

@@ -26,12 +26,8 @@ export const addMenuItem = (data) => axiosWrapper.post("/api/menu", data);
 export const updateMenuItem = ({ itemId, ...data }) =>
   axiosWrapper.put(`/api/menu/${itemId}`, data);
 
-// Payment Endpoints
-export const getPaymentConfig = () => axiosWrapper.get("/api/payment/config");
-export const createOrderRazorpay = (data) =>
-  axiosWrapper.post("/api/payment/create-order", data);
-export const verifyPaymentRazorpay = (data) =>
-  axiosWrapper.post("/api/payment/verify-payment", data);
+// Config (TVA, fidélité)
+export const getConfig = () => axiosWrapper.get("/api/config");
 
 // Order Endpoints
 export const addOrder = (data) => axiosWrapper.post("/api/order/", data);

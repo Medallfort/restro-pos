@@ -6,7 +6,7 @@ import * as schemas from "../validators/schemas.js";
 import * as users from "../controllers/userController.js";
 import * as tables from "../controllers/tableController.js";
 import * as orders from "../controllers/orderController.js";
-import * as payments from "../controllers/paymentController.js";
+import { getConfig } from "../controllers/configController.js";
 import * as menu from "../controllers/menuController.js";
 import { getRevenueReport, getStats } from "../controllers/statsController.js";
 import { STAFF_ROLES } from "../models/User.js";
@@ -78,16 +78,6 @@ router.get(
   getRevenueReport
 );
 
-router.get("/payment/config", payments.getPaymentConfig);
-router.post(
-  "/payment/create-order",
-  validateBody(schemas.createPaymentSchema),
-  payments.createPaymentOrder
-);
-router.post(
-  "/payment/verify-payment",
-  validateBody(schemas.verifyPaymentSchema),
-  payments.verifyPayment
-);
+router.get("/config", getConfig);
 
 export default router;

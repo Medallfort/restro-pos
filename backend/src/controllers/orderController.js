@@ -1,33 +1,10 @@
 import Order, { STATUS_TRANSITIONS } from "../models/Order.js";
-import Payment from "../models/Payment.js";
 import Table from "../models/Table.js";
 import User from "../models/User.js";
 import AppError from "../utils/AppError.js";
 import { computeBill } from "../utils/pricing.js";
-import { toMinorUnits } from "../utils/money.js";
 import { notifyOrders } from "../realtime/events.js";
 import { addPoints, discountFor, pointsEarnedFor, spendPoints } from "../utils/loyalty.js";
-
-// Kat7jez paiement b tari9a atomique (paid -> used): ila jouj requetes jaw f nefs l-we9t
-// b nefs paiement, wa7da bo7dha li ghadi tnje7 (protection men replay).
-// createdBy: paiement khasso ykoun dyal nefs l-compte (client ma y9derch yst3ml paiement dyal chi wa7d akhor)
-async function claimVerifiedPayment(paymentData, expectedTotal, userId) {
-  if (!paymentData?.razorpay_order_id) throw new AppError(400, "Missing payment data");
-
-  const payment = await Payment.findOneAndUpdate(
-    { razorpayOrderId: paymentData.razorpay_order_id, status: "paid", createdBy: userId },
-    { $set: { status: "used" } },
-    { returnDocument: "after" }
-  );
-  if (!payment) throw new AppError(402, "Payment not verified");
-
-  if (payment.amount !== toMinorUnits(expectedTotal)) {
-    payment.status = "paid";
-    await payment.save();
-    throw new AppError(400, "Payment amount does not match order total");
-  }
-  return payment;
-}
 
 async function findTable({ table, tableNo }) {
   const found = table ? await Table.findById(table) : await Table.findOne({ tableNo });
@@ -48,7 +25,7 @@ async function releaseTable(order) {
 }
 
 export async function createOrder(req, res) {
-  const { items, orderType, paymentMethod, paymentData } = req.body;
+  const { items, orderType, paymentMethod } = req.body;
   const isClient = req.user.role === "Client";
   const redeemPoints = req.body.redeemPoints ?? 0;
   // Points dyal compte client: serveur ma y9derch ystkhdemhom f commande dyal walk-in
@@ -66,16 +43,10 @@ export async function createOrder(req, res) {
     ? { name: req.user.name, phone: req.user.phone, guests: req.body.customerDetails.guests }
     : req.body.customerDetails;
 
-  // Points kayt9esso 9bel l-commande, w kayrj3o ila l-paiement wla l-commande tfaylat
+  // Points kayt9esso 9bel l-commande, w kayrj3o ila l-commande tfaylat
   if (redeemPoints > 0) await spendPoints(req.user._id, redeemPoints);
   let order;
-  let payment;
   try {
-    payment =
-      paymentMethod === "Online"
-        ? await claimVerifiedPayment(paymentData, bills.totalWithTax, req.user._id)
-        : null;
-
     order = await Order.create({
       customerDetails,
       orderType,
@@ -84,9 +55,6 @@ export async function createOrder(req, res) {
       bills,
       table: table?._id ?? null,
       paymentMethod,
-      paymentData: payment
-        ? { razorpay_order_id: payment.razorpayOrderId, razorpay_payment_id: payment.razorpayPaymentId }
-        : undefined,
       loyalty: { pointsRedeemed: redeemPoints },
       createdBy: req.user._id,
       servedBy: isClient ? null : req.user._id,
@@ -94,11 +62,6 @@ export async function createOrder(req, res) {
   } catch (error) {
     await addPoints(req.user._id, redeemPoints);
     throw error;
-  }
-
-  if (payment) {
-    payment.order = order._id;
-    await payment.save();
   }
 
   // Table kat-t7jez direct (7ta commande Pending), bach ma ydkhelch 3liha chi wa7d akhor

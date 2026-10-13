@@ -1,12 +1,12 @@
 import { FaGift } from "react-icons/fa";
-import { useMe, usePaymentConfig } from "../../hooks/queries";
+import { useAppConfig, useMe } from "../../hooks/queries";
 import { DEFAULT_LOYALTY, pointsValue } from "../../utils/loyalty";
 import { formatPrice } from "../../utils";
 
 // Carte de fidélité dyal client: solde, ch7al kaysswa, w ch7al b9a l remise jaya
 const LoyaltyCard = () => {
   const { data: me } = useMe();
-  const { data: config } = usePaymentConfig();
+  const { data: config } = useAppConfig();
   const loyalty = config?.loyalty ?? DEFAULT_LOYALTY;
   const points = me?.loyaltyPoints ?? 0;
   const toNext = loyalty.redeemStep - (points % loyalty.redeemStep);

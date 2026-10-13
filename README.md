@@ -73,7 +73,7 @@ in Proxmox set the VM's CPU type to `host`.
 
 **Waiter**
 1. Dish button → Dine in (type the table number, or leave it empty to pick a table) or Takeaway
-2. Add dishes to the cart, choose Cash/Online, **Place Order** → receipt (status *In Progress*)
+2. Add dishes to the cart, **Place Order** → receipt (status *In Progress*)
 3. Orders page: *Mark as Ready* → *Complete & free table*
 
 **Client** (from their phone, in the restaurant)
@@ -87,10 +87,10 @@ A table holds one active order at a time.
 Prices and tax are always computed by the server from the database; the amounts shown in
 the cart are only a preview.
 
-## Online payment (optional)
+## Payment
 
-Set `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` in `backend/.env`. Without both, the Online button
-is disabled. Note Razorpay charges in INR while the UI displays DH.
+Cash only: the customer pays at the table or the counter. (Online payment through Razorpay was
+removed: it charged in INR and does not work in Morocco.)
 
 ## Loyalty points
 
@@ -140,4 +140,4 @@ All under `/api`; everything except register/login/logout needs a session.
 | GET / POST / PUT | `/menu`, `/menu/:id` | POST/PUT Admin |
 | GET / POST / PUT | `/order`, `/order/:id` | `Completed` frees the table |
 | GET | `/stats` | today's revenue, counts, popular dishes |
-| GET / POST | `/payment/config`, `/payment/create-order`, `/payment/verify-payment` | Razorpay |
+| GET | `/config` | tax rate and loyalty rates |
